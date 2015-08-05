@@ -1,0 +1,11 @@
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.sqlite_history
+.ssh/*
+.viminfo
+.kshrc
+.lesshst
+.xcat/*
+

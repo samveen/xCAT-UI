@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Discovered Node List</title>
+
+    <!-- Bootstrap core CSS -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <!-- Optional theme. Disable? -->
+    <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css" -->
+
+    <!-- Bootstrap Table Plugin CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css">
+
+    <!-- Bootstrap Datepicker Plugin CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/list.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Node List</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <!-- li><p class="navbar-btn"><button type="button" class="btn btn-lg btn-primary btn-margin-right" data-toggle="modal" data-target="#myModal">Add</button></p></li -->
+            <!-- li><p class="navbar-btn"><button type="button" class="btn btn-lg btn-primary btn-margin-left" data-toggle="modal" data-target="#addURLModal">Add via URL</button></p></li -->
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><p class="navbar-btn"><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+    <div class="container">
+      <div id="msgs"></div>
+
+      <div class="alerter-main">
+        <h1>Node List</h1>
+        <!-- div id="toolbar">
+          <button id="remove" class="btn btn-danger" disabled>
+            <i class="glyphicon glyphicon-remove"></i> Delete
+          </button>
+               data-toolbar="#toolbar"
+        </div -->
+        <table id="dataTable"
+               class="table-hover table-condensed table-striped"
+               data-toggle="table"
+               data-sort-name="expiry"
+               data-sort-order="desc"
+               data-pagination="true"
+               data-page-size="20"
+               data-click-to-select="true"
+               data-url="cgi-bin/getNodeList">
+          <thead>
+            <tr>
+              <!-- th data-field="state" data-checkbox="true"></th -->
+              <th data-field="serial" data-sortable="true"></th>
+              <th data-field="groups" data-sortable="true">groups</th>
+              <th data-field="ip" data-sortable="true">ip</th>
+              <th data-field="cputype" data-sortable="true">cputype</th>
+              <th data-field="memory" data-sortable="true">memory</th>
+              <th data-field="rack" data-sortable="true">rack</th>
+              <th data-field="unit" data-sortable="true">unit</th>
+              <th data-field="currstate" data-sortable="true">currstate</th>
+              <th data-field="status" data-sortable="true">status</th>
+              <th data-field="statustime" data-sortable="true">statustime</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+
+    </div><!-- /.container -->
+   
+    <div id="aboutBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aboutBoxLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="aboutBoxLabel">Built by Samveen &lt;infra@Lazada.com&gt;</h3>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Begin Container for Add form -->
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Add Tracking Item</h3>
+          </div>
+          <div class="modal-body">
+            <form class="form-horizontal col-sm-12">
+              <!-- TODO - Add data validation to form -->
+              <div class="form-group">
+                <label for="type">Type</label>
+                <input name="type" class="form-control" placeholder="Item Type" type="text">
+              </div>
+              <div class="form-group">
+                <label for="host">Host</label>
+                <input name="host" class="form-control host" placeholder="Hostname where the item is(can contain wildcards)" data-placement="top" data-trigger="manual" type="text">
+              </div>
+              <div class="form-group">
+                <label for="path">Path</label>
+                <input name="path" class="form-control path" placeholder="Path of item" data-placement="top" data-trigger="manual" data-content="" type="text">
+              </div>
+              <div class="form-group">
+                <label for="expiry">Expiry</label>
+                <div class="input-group date">
+                  <input name="expiry" class="form-control" placeholder="Expiration date of the item" data-placement="top" data-content="" type="text">
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <button id="submit" type="submit" class="btn btn-success pull-right">Add</button>
+                <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Container for Add form -->
+
+    <!-- Begin Container for Add URL form -->
+    <div id="addURLModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="AddURLModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="AddURLModalLabel">Add Item via URL</h3>
+          </div>
+          <div class="modal-body">
+            <form class="form-horizontal col-sm-12">
+              <!-- TODO - Add data validation to form -->
+              <div class="form-group">
+                <label for="url">URL</label>
+                <input name="url" class="form-control" placeholder="hostname.domain[:port](default:443)" type="text">
+              </div>
+              <div class="form-group">
+                <button id="submit" type="submit" class="btn btn-success pull-right">Add</button>
+                <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Container for Add URL form -->
+
+    <!-- Bootstrap core JavaScript BEGIN -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript END -->
+
+    <!-- Bootstrap Table plugin JavaScript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
+
+    <!-- Bootstrap Datepicker plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
+
+
+    <script lang="javascript"> <!-- Custom JS -->
+/*
+    $(function() {
+        //Twitter bootstrap scripts
+        // Delete button handler
+        var $table = $("#dataTable");
+        var $removeBTN = $('#remove');
+
+        $removeBTN.click(function () {
+            var selected = $.map($table.bootstrapTable('getSelections'), function (row) { return row.rowid });
+///////
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/removeData",
+                data: JSON.stringify({ rowids: selected.join() }),
+                dataType: "json",
+                success: function(msg) {
+                    if(msg.status==='Success' || msg.status==='success') {
+                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+"</div>");
+                        $table.bootstrapTable('refresh', {silent: true});
+                        $removeBTN.prop('disabled', true);
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+": "+msg.exception+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+
+////////
+            $removeBTN.prop('disabled', true);
+
+        });
+
+        // Checkbox handler to enable/disable "remove" button
+        $table.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
+            $removeBTN.prop('disabled', !$table.bootstrapTable('getSelections').length);
+        });
+
+        // Add Form Submit handler
+        $("#myModal #submit").click(function(){
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/putData",
+                data: $('#myModal form').serialize(),
+                dataType: "json",
+                success: function(msg) {
+                    if(msg.status==='Success' || msg.status==='success') {
+                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+"</div>");
+                        $('#dataTable').bootstrapTable('refresh', {silent: true});
+                        $("#myModal form")[0].reset();
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+": "+msg.exception+"</div>");
+                    }
+                    $("#myModal").modal('hide');
+                },
+                error: function(x,s,e) {
+                    $("#myModal").modal('hide');
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            return(false);
+        });
+
+        // Add URL Submit handler
+        $("#addURLModal #submit").click(function(){
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/putURL",
+                data: $('#addURLModal form').serialize(),
+                dataType: "json",
+                success: function(msg) {
+                    if(msg.status==='Success' || msg.status==='success') {
+                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+"</div>");
+                        $('#dataTable').bootstrapTable('refresh', {silent: true});
+                        $("#addURLModal form")[0].reset();
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+": "+msg.exception+"</div>");
+                    }
+                    $("#addURLModal").modal('hide');
+                },
+                error: function(x,s,e) {
+                    $("#addURLModal").modal('hide');
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            return(false);
+        });
+
+        // Initializer for Date Picker in "Add form"
+        $('#myModal .input-group.date').datepicker({
+            format: "yyyy-mm-dd",
+            startDate: "Today",
+            startView: 1,
+            autoclose: true
+        });
+    }); */
+    </script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+body {
+  min-height: 2000px;
+}
+.navbar-static-top {
+  margin-bottom: 19px;
+}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+.form-control:focus {
+	border-color: #fddbab;
+	outline: 0; 
+	-webkit-box-shadow: inset 0;
+		  box-shadow: inset 0;
+	background-color: #fddbab;
+}
+/* navbar button spacing*/
+.btn-margin-left {
+    margin-left: 6px;
+}
+.btn-margin-right {
+    margin-right: 6px;
+}
