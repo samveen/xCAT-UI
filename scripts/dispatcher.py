@@ -31,6 +31,7 @@ def app(environ, start_response):
     response=[]
     try:
         module=__import__(script)
+        reload(module)
         response=module.main(environ)
         start_response('200 OK', [('Content-Type', 'application/javascript;charset=utf-8')])
         logger.info("Script '{0}' called: Responded with {1}".format(script,"200 OK"))

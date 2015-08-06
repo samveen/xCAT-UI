@@ -4,5 +4,5 @@
 """
 
 config={
-    'socket': '/var/lib/webui/fcgi/fcgi.sock'
+    'socket': '../fcgi/fcgi.sock'
 }

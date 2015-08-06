@@ -25,8 +25,9 @@ def main (environ):
     for line in fd: 
         if "=" not in line:
             if node != "":
-                result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
-                
+                if "spare" in fields["node"] and "-ilo" not in fields["node"]:
+                    result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
+
             node=line.split(':',2)[1].strip()
             fields={"node":node}
         else:
@@ -37,6 +38,7 @@ def main (environ):
     ## Expected json form of array of row dicts
     """[
         {
+            "node": "",
             "serial": "",
             "groups": "",
             "ip": "",
