@@ -5,19 +5,25 @@
 
 from conf import config
 
+import cgi
 import subprocess
 
 def main (environ):
     """ Reads the DB and returns a json result as a list of strings
     """
+    command=[ "lsdef",
+                  "-t", "node",
+                  "-i", "serial,groups,ip,cputype,memory,rack,unit,currstate,status,statustime"
+            ]
 
     result=[]
+    params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
+
+    if "group" in params:
+        command.append(params['group'].value)
 
     # fields: serial,groups,ip,cputype,memory,rack,unit,currstate,status,statustime
-    fd=subprocess.Popen([ "lsdef",
-                          "-t", "node",
-                          "-i", "serial,groups,ip,cputype,memory,rack,unit,currstate,status,statustime"
-                        ],
+    fd=subprocess.Popen(command,
                         shell=False, stdout=subprocess.PIPE).stdout
 
     fields={}
@@ -65,5 +71,7 @@ def main (environ):
 
 if __name__ == "__main__":
     import os
-    for x in main(os.environ):
+    environ=os.environ
+    environ['wsgi.input']=''
+    for x in main(environ):
         print x,

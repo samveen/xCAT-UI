@@ -80,7 +80,9 @@
                data-pagination="true"
                data-page-size="20"
                data-click-to-select="true"
-               data-url="cgi-bin/getNodeList">
+               data-id-field="node"
+               data-search="true">
+               <!-- data-url="cgi-bin/getNodeList" -->
           <thead>
             <tr>
               <!-- th data-field="state" data-checkbox="true"></th -->
@@ -208,11 +210,22 @@
 
 
     <script lang="javascript"> <!-- Custom JS -->
-/*
     $(function() {
         //Twitter bootstrap scripts
         // Delete button handler
         var $table = $("#dataTable");
+        // handler for Row click
+        $table.on('click-row.bs.table', function (e, row, $element) {
+                alert('Event: click-row.bs.table, data: ' + JSON.stringify(row));
+        });
+
+        $(document).ready(function() {
+            if(location.search.match("\\bgroup=")!=null) 
+              $('#dataTable').bootstrapTable('refresh', {url: 'cgi-bin/getNodeList?group=' + location.search.split(new RegExp("\\bgroup="))[1]});
+            else
+              $('#dataTable').bootstrapTable('refresh', {url: 'cgi-bin/getNodeList'});
+        });
+/*
         var $removeBTN = $('#remove');
 
         $removeBTN.click(function () {
@@ -303,8 +316,8 @@
             startDate: "Today",
             startView: 1,
             autoclose: true
-        });
-    }); */
+        }); */
+    });
     </script>
   </body>
 </html>
