@@ -216,7 +216,7 @@
         var $table = $("#dataTable");
         // handler for Row click
         $table.on('click-row.bs.table', function (e, row, $element) {
-                alert('Event: click-row.bs.table, data: ' + JSON.stringify(row));
+                location.href= location.origin+"/webui/addNode.html?node="+row.node;
         });
 
         $(document).ready(function() {
