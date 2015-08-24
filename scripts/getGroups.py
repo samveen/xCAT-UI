@@ -34,21 +34,13 @@ def main (environ):
 
     # Get results and convert to expected json for each row
     ## Expected json form of array of row dicts
-    """[
-        {
-            "node": "",
-            "serial": "",
-            "groups": "",
-            "ip": "",
-            "cputype": "",
-            "memory": "",
-            "rack": "",
-            "unit": "",
-            "currstate": "",
-            "status": "",
-            "statustime": ""
-        }, ... //no trailing comma
-    ]"""
+    """{
+        "groups" : [
+                     { "name": "G1" : "count" : "c1" }
+                     { "name": "G2" : "count" : "c2" }
+        ],
+        "msg" : { "status" : "success|failure", exception : "Cause" }
+    }"""
     #for r in c.fetchall():
     #    result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=columns[i],v=r[i]) for i in range(len(columns))])))
 
