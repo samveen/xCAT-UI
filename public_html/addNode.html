@@ -99,6 +99,12 @@
         $("#about").click(function() {
              alert('home clicked');
         });
+        $(document).ready(function() {
+            if(location.search.match("\\bnode=")!=null) {
+                alert("Loading data for "+location.search.split(new RegExp("\\bnode="))[1].split('&')[0]);
+            } else
+                alert("No Node selected");
+        });
 
       })
     </script>
