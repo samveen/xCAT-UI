@@ -1,6 +1,6 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""This module contains the code for reading data from the sqlite DB and returning it as json
+"""This module handles requests to change node data.
 """
 
 from conf import config
@@ -9,18 +9,17 @@ import cgi
 import subprocess
 
 def main (environ):
-    """ Reads the DB and returns a json result as a list of strings
+    """ Reads the query string and updates node fields as per values
     """
     command=[ "lsdef",
                   "-t", "node",
                   "-o"
             ]
 
-    result=[]
     params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
 
     if "node" not in params:
-        result.append('"msg" : {"status" : "failure", "exception" : "Node not given"}')
+        result.append('"error" : {"code" : 1, "message" : "Node not given"}')
     else:
         command.append(params['node'].value)
 
@@ -59,6 +58,8 @@ Object name: spare19-a1
     supportedarchs=x86,x86_64
     unit=19
 """
+        result=[]
+
         fields={}
         required_fields=['serial','mac','memory','cputype','bmc','rack','unit','ip','nicips.ens1f0']
         node=""
@@ -83,36 +84,25 @@ Object name: spare19-a1
 
         if "node" in fields:
             if "spare" in fields["node"] and "-ilo" not in fields["node"]:
-                result.append('"msg" : {"status" : "success", "exception" : ""}')
-                result.append('"node": {{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) if 'mac' not in k else '"{k}": {v}'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
+                result.append('"data": {{ "updated" : "{0}" }}'.format(params["newname"].value))
             else: 
-                result.append('"msg" : {"status" : "failure", "exception" : "Node not a spare node"}')
+                result.append('"error" : {"code" : 4, "message" : "Node not a spare node"}')
         else: 
-            result.append('"msg" : {"status" : "failure", "exception" : "Node not found"}')
+            result.append('"error" : {"code" : 2, "message" : "Node not found"}')
 
 
-        # Get results and convert to expected json for each row
-        ## Expected json form of array of row dicts
+        ## Expected json form of result
         """{
-            "node" : {
-                "node": "",
-                "serial": "",
-                "groups": "",
-                "ip": "",
-                "cputype": "",
-                "memory": "",
-                "rack": "",
-                "unit": "",
-                "currstate": "",
-                "status": "",
-                "statustime": ""
-            }, 
-            "msg" : { "status" : "success|failure", exception : "Cause" } //no trailing comma
+            "data" : {
+                "updated": "BrandNewNode"
+            }  if (success) else 
+            "error" : {
+                "code" : 0|int,
+                "message" : "Cause"
+            }
         }"""
-        #for r in c.fetchall():
-        #    result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=columns[i],v=r[i]) for i in range(len(columns))])))
 
-    # make ''.join(result) a valid json array of rows
+    # make ''.join(result) a valid json object
     result=",\n`".join(result).split('`')
     result.insert(0,"{\n")
     result.append("}\n")

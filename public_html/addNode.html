@@ -1,9 +1,18 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="xCAT Groups list">
+    <meta name="author" content="Samveen">
+    <link rel="icon" href="/favicon.ico">
+
     <title>Add Node</title>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/node.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
   </head>
@@ -22,7 +31,7 @@
             <div class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
                 <li class="active  navbar-btn">
-                  <button id="about" class="btn btn-primary">About</button>
+                  <button id="about" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button>
                 </li>
               </ul>
               <ul class="nav navbar-nav pull-right">
@@ -35,75 +44,242 @@
         </div>
       </header>
     </div>
-    <div class="container-fluid">
-      <div class="col-xs-6 col-md-6">
-      <form>
-        <div class="panel panel-default">
-          <div class="panel-heading">Add Node
+    <div class="container">
+      <div id="msgs"></div>
+
+      <div class="app-main" id="app">
+       <div class="col-xs-8 col-md-8">
+       <form id="updateForm">
+         <div class="panel panel-default">
+           <div class="panel-heading">Assign Node</div>
+           <div class="panel-body">
+             <div class="row">
+               <div class="col-md-4">
+                 <div class="form-group">
+                   <label class="control-label">Node</label>
+                   <div class="controls">
+                     <input type="text" class="form-control" placeholder="Node Name" id="node" name="node" readonly>
+                   </div>
+                 </div>
+               </div>
+               <div class="col-md-8">
+                 <div class="form-group">
+                   <label class="control-label">Post-provisioning Name ( <span class="glyphicon glyphicon-pencil"></span> )</label>
+                   <div class="controls">
+                     <input type="text" class="form-control" placeholder="New Name: DcVtrEnvRoleIndex" id="newname" name="newname">
+                   </div>
+                 </div>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-md-3">
+                 <div class="form-group">
+                   <label class="control-label">Serial</label>
+                   <div class="controls">
+                     <input type="text" class="form-control" placeholder="Serial" id="serial" name="serial" readonly>
+                   </div>
+                 </div>
+               </div>
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="control-label">CPU</label>
+                   <div class="controls">
+                     <input type="text" class="form-control" placeholder="CPU" id="cputype" readonly>
+                   </div>
+                 </div>
+               </div>
+               <div class="col-md-3">
+                 <div class="form-group">
+                   <label class="control-label">Memory</label>
+                   <div class="controls">
+                     <input type="text" class="form-control" placeholder="Memory" id="memory" readonly>
+                   </div>
+                 </div>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-md-3">
+                 <div class="form-group"><label class="control-label">MAC: Private</label><div class="controls"><input type="text" class="form-control" placeholder="Mac" id='eno1' name="eno1" readonly></div></div>
+               </div>
+               <div class="col-md-3">
+                 <div class="form-group"><label class="control-label">IP: Private</label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='ip' name='ip' readonly></div></div>
+               </div>
+               <div class="col-md-3">
+                 <div class="form-group"><label class="control-label">MAC: Public</label><div class="controls"><input type="text" class="form-control" placeholder="Mac" id='ens1f0' name='ens1f0' readonly></div></div>
+               </div>
+               <div class="col-md-3">
+                 <div class="form-group"><label class="control-label">IP: Public ( <span class="glyphicon glyphicon-pencil"></span> )</label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='nicips.ens1f0' name='nicips.ens1f0'></div></div>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="control-label">xCAT OS Profile ( <span class="glyphicon glyphicon-pencil"></span> )</label>
+                   <div class="dropdown">
+                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="osimage" name="osimage">Select OS Profile ...<span class="caret"></span></button>
+                     <input class='data-holder' type=hidden id="osimage" name="osimage">
+                     <ul id="osimageDropdown" class="dropdown-menu" aria-labelledby="osimageBtn">
+                       <!-- <li><a href="#">WeirdOS - Random Use</a></li> -->
+                     </ul>
+                   </div>
+                 </div>
+               </div>
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="control-label">Node Group ( <span class="glyphicon glyphicon-pencil"></span> )</label>
+                   <!-- div class="controls"><input type="text" class="form-control" placeholder="Group" id='group' name='group'></div -->
+                   <div class="dropdown">
+                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="groupBtn" name="groupBtn"><input type=hidden id="group" name="group">Select Target Group ...<span class="caret"></span></button>
+                     <input class='data-holder' type=hidden id="group" name="group">
+                     <ul id="groupDropdown" class="dropdown-menu" aria-labelledby="groupBtn">
+                       <!-- <li><a href="#">LZD-WRD-MAIN</a></li> -->
+                     </ul>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="panel-footer">
+             <button id="submit" class="btn btn-primary">Update</button><button class="btn btn-primary pull-right">Cancel</button>
+           </div>
+         </div>
+       </form>
+       </div>
+     </div>
+    </div>
+
+    <!-- About Box -->
+    <div id="aboutBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aboutBoxLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="aboutBoxLabel">Built by Samveen &lt;infra@Lazada.com&gt;</h3>
           </div>
-          <div class="panel-body">
-            <div class="form-group">
-              <label class="control-label">Serial</label>
-              <div class="controls input-group">
-                <input type="text" class="form-control" placeholder="User Input">
-                <span class="input-group-btn">
-                  <button class="btn btn-default" type="button" data-toggle="tooltip" data-placement="right" title="Load Node Data"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
-                </span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label">Role</label>
-              <div class="controls">
-                <input type="text" class="form-control" placeholder="Role/Name?">
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label">Node UUID</label>
-              <div class="controls">
-                <input type="text" class="form-control" placeholder="Autoload">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="form-group"><label class="control-label">MAC: IPMI</label><div class="controls"><input type="text" class="form-control" placeholder="Autoload"></div></div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group"><label class="control-label">MAC: Service</label><div class="controls"><input type="text" class="form-control" placeholder="Autoload"></div></div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group"><label class="control-label">MAC: Data</label><div class="controls"><input type="text" class="form-control" placeholder="Autoload"></div></div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label">xCAT OS Profile</label>
-              <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownOSImage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Select OS Profile ...<span class="caret"></span></button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownOSImage">
-                  <li><a href="#">RHEL 6.6 - Web</a></li>
-                  <li><a href="#">Centos 7.1 - DB</a></li>
-                  <li><a href="#">WeirdOS - Random Use</a></li>
-                </ul>
-              </div>
-            </div>
+          <div class="modal-body">
           </div>
-          <div class="panel-footer">
-            <button class="btn btn-primary">Add</button><button class="btn btn-primary pull-right">Cancel</button>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
           </div>
         </div>
-      </form>
       </div>
     </div>
+    <!-- About Box END-->
+
     <script>
       $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-        $("#about").click(function() {
-             alert('home clicked');
-        });
         $(document).ready(function() {
+            // Enable tooltip 
+            $('[data-toggle="tooltip"]').tooltip()
+            // Enable click for Add button
+            $("#submit").click(function(){
+                alert($("#app form").serialize());
+                //alert("Yeah right :P");
+                return false;
+            });
+            // Load Node data into form
             if(location.search.match("\\bnode=")!=null) {
-                alert("Loading data for "+location.search.split(new RegExp("\\bnode="))[1].split('&')[0]);
+                $.ajax({
+                    type: "GET",
+                    url: "cgi-bin/getNodeInfo",
+                    dataType: "json",
+                    data: 'node='+location.search.split(new RegExp("\\bnode="))[1].split('&')[0],
+                    success: function(data) {
+                        if(data.msg.status==='Success' || data.msg.status==='success') {
+                            for(var k in data.node) {
+                                if(k==='mac') {
+                                    for(var m in data.node[k]) {
+                                        $('#'+data.node[k][m].name).val(data.node[k][m].mac);
+                                    }
+                                } else {
+                                    $("[id='"+k+"']").val(data.node[k]);
+                                }
+                            }
+                        } else {
+                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
+                        }
+                    },
+                    error: function(x,s,e) {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                    }
+                });
             } else
                 alert("No Node selected");
+            // Load osimage into form
+            $.ajax({
+                type: "GET",
+                url: "cgi-bin/getOSImages",
+                dataType: "json",
+                data: {},
+                success: function(data) {
+                    if(data.msg.status==='Success' || data.msg.status==='success') {
+                        //$('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+"</div>");
+                        var $osimage = $("#osimageDropdown");
+                        for(index in data.osimages) {
+                            $osimage.append('<li><a href="#">'+data.osimages[index]+'</a></li>');
+                        }
+                        $(".dropdown-menu li a").click(function(){
+                            var $btn=$(this).parents(".dropdown").find('.btn');
+                            $btn.html($(this).text()+' <span class="caret"></span>');
+                            var $input=$(this).parents(".dropdown").find('.data-holder');
+                            $input.val($(this).text());
+                        });
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.error.code+": "+obj.error.message+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            // Target groups
+            $.ajax({
+                type: "GET",
+                url: "data/groups.json",
+                dataType: "json",
+                data: {},
+                success: function(obj) {
+                    if(obj.data) {
+                        var $group = $("#groupDropdown");
+                        for(index in obj.data.groups) {
+                            $group.append('<li><a href="#">'+obj.data.groups[index]+'</a></li>');
+                        }
+                        /* Already done above. If not, doesn't matter anyway since we cannot submit form successfully.
+                        $(".dropdown-menu li a").click(function(){
+                            var $btn=$(this).parents(".dropdown").find('.btn');
+                            $btn.val($(this).text());
+                            $btn.html($(this).text()+' <span class="caret"></span>');
+                        }); */
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            // Form Submit handler
+            $("#updateForm #submit").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "cgi-bin/changeNode",
+                    data: $('#updateForm').serialize(),
+                    dataType: "json",
+                    success: function(obj) {
+                        if(obj.data) {
+                            $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Provisioning for "+obj.data.updated+" started </div>");
+                        } else {
+                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+data.error.code+": "+data.error.message+"</div>");
+                        }
+                    },
+                    error: function(x,s,e) {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                    }
+                });
+                return(false);
+            });
+
+            // Anything else
         });
 
       })

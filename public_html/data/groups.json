@@ -1,0 +1,12 @@
+{
+    "data": {
+        "groups" : [
+            "ID-LZD-ALICE-LIVE",
+            "ID-LZD-ALICE-STAG",
+            "ID-LZD-APPS-LIVE",
+            "ID-LZD-APPS-SHRM",
+            "ID-LZD-APPS-STAG",
+            "ID-SC-APPS"
+        ]
+    }
+}
