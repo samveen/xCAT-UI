@@ -16,96 +16,92 @@ def main (environ):
                   "-o"
             ]
 
+    required_params=['serial','node','newname','ip','eno1','ens1f0','nicips.ens1f0','group','osimage']
+    required_fields=['serial','mac','ip','nicips.ens1f0']
+    verify_fields=['serial','node','ip','eno1','ens1f0']
+
     params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
+    
+    result=[]
 
-    if "node" not in params:
-        result.append('"error" : {"code" : 1, "message" : "Node not given"}')
+    fields={}
+
+        # Check required params
+    missing=[]
+    for k in required_params:
+        if k not in params or not params[k].value:
+            missing.append(k)
+    if len(missing) > 0:
+        # Required params not found
+        result.append('"error" : {{"code" : 8, "message" : "Missing required Params: {0}"}}'.format(','.join(missing)))
     else:
-        command.append(params['node'].value)
+        # Required params found
 
-        # fields: serial,groups,ip,cputype,memory,rack,unit,currstate,status,statustime
+        command.append('{0},{1}'.format(params['node'].value,params['newname'].value))
         fd=subprocess.Popen(command,
-                            shell=False, stdout=subprocess.PIPE).stdout
-
+                                shell=False, stdout=subprocess.PIPE).stdout
         """
 Object name: spare19-a1
-    arch=x86_64
-    bmc=spare19-a1-ilo
-    bmcpassword=@Frewfyev5
-    bmcusername=lzdinfra
-    chain=runimage=http://10.18.16.10/install/custom_runimage/glpi_discover.tgz,shell
-    cpucount=24
-    cputype=Intel(R) Xeon(R) CPU E5-2430 v2 @ 2.50GHz
-    currchain=shell
-    currstate=shell
     groups=uatprovision,ilo,AllRackA1
-    height=1
-    initrd=xcat/genesis.fs.x86_64.gz
     ip=10.18.16.12
-    kcmdline=quiet xcatd=10.18.16.10:3001 destiny=shell
-    kernel=xcat/genesis.kernel.x86_64
-    mac=c4:34:6b:c5:22:c4
-    memory=32010MB
-    mgt=ipmi
-    netboot=xnba
-    ondiscover=nodediscover
-    postbootscripts=otherpkgs
-    postscripts=syslog,remoteshell,syncfiles
-    rack=A1
+    mac=14:58:d0:5b:a1:30!spare32-priv|8c:dc:d4:01:7b:90!spare32-pub
+    mac=c4:34:6b:c5:22:c4 (Alternative and a bad one)
     serial=SGH517XNND
-    status=booting
-    statustime=08-14-2015 20:43:40
-    supportedarchs=x86,x86_64
-    unit=19
 """
-        result=[]
 
-        fields={}
-        required_fields=['serial','mac','memory','cputype','bmc','rack','unit','ip','nicips.ens1f0']
         node=""
         for line in fd: 
             if "=" not in line:
                 node=line.split(':',2)[1].strip()
-                fields={"node":node}
+                fields[node]={"node":node}
             else:
                 key,sep,val=line.strip().partition('=')
                 if key in required_fields:
-                    if key in 'mac':
-                        if '|' in val:
-                            macs=[]
-                            for i in val.split('|'):
-                                m,s,n=i.partition('!')
-                                macs.append('{{"name": "{n}", "mac": "{m}"}}'.format(n='eno1' if 'priv' in n else 'ens1f0',m=m))
-                            fields[key]="[ {0} ]".format(",".join(macs))
-                        else:
-                            fields[key]='[ {{ "name": "eno1", "mac": "{0}"}} ]'.format(val)
+                    if key in 'mac' and '|' in val:
+                        for i in val.split('|'):
+                            m,s,n=i.partition('!')
+                            fields[node]['eno1' if 'priv' in n else 'ens1f0']=m
                     else:
-                        fields[key]=val
+                        fields[node][key]=val
 
-        if "node" in fields:
-            if "spare" in fields["node"] and "-ilo" not in fields["node"]:
-                result.append('"data": {{ "updated" : "{0}" }}'.format(params["newname"].value))
+        node=params["node"].value
+        if params["newname"].value in fields:
+            # Target Node found
+            result.append('"error" : {"code" : 32, "message" : "Target node already exists"}')
+        elif node in fields:
+            # Node found
+            if "spare" in node:
+                # We're dealing only with spare nodes
+                for k in verify_fields:
+                    if k not in fields[node] or fields[node][k] != params[k].value:
+                        print '{0}: {1},{2}'.format(k,fields[node][k],params[node][k].value)
+                        result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
+                        break
+                if len(result) == 0:
+                    result.append('"data": {{ "updated" : "{0}" }}'.format(params["newname"].value))
             else: 
+                # Error: not a spare
                 result.append('"error" : {"code" : 4, "message" : "Node not a spare node"}')
         else: 
+            # Error: node not found
             result.append('"error" : {"code" : 2, "message" : "Node not found"}')
 
 
         ## Expected json form of result
-        """{
-            "data" : {
-                "updated": "BrandNewNode"
-            }  if (success) else 
-            "error" : {
-                "code" : 0|int,
-                "message" : "Cause"
-            }
-        }"""
+    """{
+        "data" : {
+            "updated": "BrandNewNode"
+        }  if (success) else 
+        "error" : {
+            "code" : 0|int,
+            "message" : "Cause"
+        }
+    }"""
 
     # make ''.join(result) a valid json object
     result=",\n`".join(result).split('`')
     result.insert(0,"{\n")
-    result.append("}\n")
+    result.append("\n}")
 
     # Cleanup
     # return the results
