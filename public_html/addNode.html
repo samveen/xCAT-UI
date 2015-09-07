@@ -117,7 +117,7 @@
                    <label class="control-label">xCAT OS Profile ( <span class="glyphicon glyphicon-pencil"></span> )</label>
                    <div class="dropdown">
                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="osimage" name="osimage">Select OS Profile ...<span class="caret"></span></button>
-                     <input class='data-holder' type=hidden id="osimage" name="osimage">
+                     <input class="data-holder hidden" id="osimage" name="osimage">
                      <ul id="osimageDropdown" class="dropdown-menu" aria-labelledby="osimageBtn">
                        <!-- <li><a href="#">WeirdOS - Random Use</a></li> -->
                      </ul>
@@ -129,8 +129,8 @@
                    <label class="control-label">Node Group ( <span class="glyphicon glyphicon-pencil"></span> )</label>
                    <!-- div class="controls"><input type="text" class="form-control" placeholder="Group" id='group' name='group'></div -->
                    <div class="dropdown">
-                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="groupBtn" name="groupBtn"><input type=hidden id="group" name="group">Select Target Group ...<span class="caret"></span></button>
-                     <input class='data-holder' type=hidden id="group" name="group">
+                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="groupBtn" name="groupBtn">Select Target Group ...<span class="caret"></span></button>
+                     <input class="data-holder hidden" id="group" name="group">
                      <ul id="groupDropdown" class="dropdown-menu" aria-labelledby="groupBtn">
                        <!-- <li><a href="#">LZD-WRD-MAIN</a></li> -->
                      </ul>
@@ -241,8 +241,9 @@
                         /* Already done above. If not, doesn't matter anyway since we cannot submit form successfully.
                         $(".dropdown-menu li a").click(function(){
                             var $btn=$(this).parents(".dropdown").find('.btn');
-                            $btn.val($(this).text());
                             $btn.html($(this).text()+' <span class="caret"></span>');
+                            var $input=$(this).parents(".dropdown").find('.data-holder');
+                            $input.val($(this).text());
                         }); */
                     } else {
                         $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
@@ -250,6 +251,13 @@
                 },
                 error: function(x,s,e) {
                     $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            // FIREFOX HACK: Fix Dropdown display selection  on form reload
+            $("input.data-holder.hidden").each(function(){
+                if($(this).value!="") {
+                    var $btn=$(this).parents(".dropdown").find('.btn');
+                    $btn.html($(this).val()+' <span class="caret"></span>');
                 }
             });
             // Form Submit handler
