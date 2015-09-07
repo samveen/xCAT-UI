@@ -254,6 +254,7 @@
             });
             // Form Submit handler
             $("#updateForm #submit").click(function(){
+                $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
                 $.ajax({
                     type: "POST",
                     url: "cgi-bin/changeNode",
@@ -263,7 +264,7 @@
                         if(obj.data) {
                             $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Provisioning for "+obj.data.updated+" started </div>");
                         } else {
-                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+data.error.code+": "+data.error.message+"</div>");
+                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+obj.error.code+": "+obj.error.message+"</div>");
                         }
                     },
                     error: function(x,s,e) {
