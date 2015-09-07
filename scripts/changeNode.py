@@ -97,26 +97,29 @@ Object name: spare19-a1
             if len(result) == 0:
                 # All checks passed. Do your magic:
                 # Remove dhcp,dns,hosts entries
-                print "makedhcp -d {0},{0}-ilo".format(node)
-                print "makedns -d {0},{0}-ilo".format(node)
-                print "makehosts -d {0},{0}-ilo".format(node)
+                print ["makedhcp","-d","{0},{0}-ilo".format(node)]
+                print ["makedns","-d","{0},{0}-ilo".format(node)]
+                print ["makehosts","-d","{0},{0}-ilo".format(node)]
                 # Rename node and ilo
-                print "chdef -t node -o {o} -n {n}".format(o=node,n=newnode)
-                print "chdef -t node -o {o}-ilo -n {n}-ilo".format(o=node,n=newnode)
+                print ["chdef","-t","node","-o","{o}".format(o=node),"-n","{n}".format(n=newnode)]
+                print ["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
+                # Change groups to remove uatprovision and add new group
+                print ["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
+                print ["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["group"].value)]
                 # Change mac-associated names
-                mac="'{eno1}!{n}-priv|{ens1f0}!{n}-pub'".format(n=newnode,eno1=params["eno1"].value,ens1f0=params["ens1f0"].value)
-                print "chdef -t node {n} 'mac={m}'".format(n=newnode,m=mac)
+                mac="{eno1}!{n}-priv|{ens1f0}!{n}-pub".format(n=newnode,eno1=params["eno1"].value,ens1f0=params["ens1f0"].value)
+                print ["chdef","-t","node","{n}".format(n=newnode),"mac={m}".format(m=mac)]
                 # Remake dhcp,dns,hosts entries
                 if not params["nicips.ens1f0"].value == fields[node]["nicips.ens1f0"]:
-                    print "chdef -t node {n} 'nicips.ens1f0=={newip}'".format(n=newnode,newip=params["nicips.ens1f0"].value)
+                    print ["chdef","-t","node","{n}".format(n=newnode),"nicips.ens1f0=={newip}".format(newip=params["nicips.ens1f0"].value)]
                 # Remake dhcp,dns,hosts entries
-                print "makehosts {0},{0}-ilo".format(newnode)
-                print "makedns {0},{0}-ilo".format(newnode)
-                print "makedhcp {0},{0}-ilo".format(newnode)
+                print ["makehosts","{0},{0}-ilo".format(newnode)]
+                print ["makedns","{0},{0}-ilo".format(newnode)]
+                print ["makedhcp","{0},{0}-ilo".format(newnode)]
 
-                print "nodeset {n} osimage={osimage}".format(n=newnode,osimage=params["osimage"].value)
-                print "rsetboot {n} net".format(n=newnode)
-                print "power {n} reset".format(n=newnode)
+                print ["nodeset","{n}".format(n=newnode),"osimage={osimage}".format(osimage=params["osimage"].value)]
+                print ["rsetboot","{n}".format(n=newnode),"net"]
+                print ["rpower","{n}".format(n=newnode),"reset"]
                 result.append('"data": {{ "updated" : "{0}" }}'.format(newnode))
 
 
