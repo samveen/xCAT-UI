@@ -50,6 +50,7 @@ Object name: spare19-a1
 """
 
         node=""
+        # Load node data and newnode data (in case newnode already exists)
         for line in fd: 
             if "=" not in line:
                 node=line.split(':',2)[1].strip()
@@ -63,28 +64,60 @@ Object name: spare19-a1
                             fields[node]['eno1' if 'priv' in n else 'ens1f0']=m
                     else:
                         fields[node][key]=val
+        fd.close()
 
         node=params["node"].value
-        if params["newname"].value in fields:
+        newnode=params["newname"].value
+        if newnode in fields:
             # Target Node found
             result.append('"error" : {"code" : 32, "message" : "Target node already exists"}')
-        elif node in fields:
-            # Node found
-            if "spare" in node:
-                # We're dealing only with spare nodes
-                for k in verify_fields:
-                    if k not in fields[node] or fields[node][k] != params[k].value:
-                        print '{0}: {1},{2}'.format(k,fields[node][k],params[node][k].value)
-                        result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
-                        break
-                if len(result) == 0:
-                    result.append('"data": {{ "updated" : "{0}" }}'.format(params["newname"].value))
-            else: 
-                # Error: not a spare
-                result.append('"error" : {"code" : 4, "message" : "Node not a spare node"}')
-        else: 
+        elif node not in fields:
             # Error: node not found
             result.append('"error" : {"code" : 2, "message" : "Node not found"}')
+        elif "spare" not in node:
+            # Error: Node found, but not a spare
+            result.append('"error" : {"code" : 4, "message" : "Node not a spare node"}')
+        else: 
+            # We're dealing with an existing spare node
+            # Verify fields
+            for k in verify_fields:
+                if k not in fields[node] or fields[node][k] != params[k].value:
+                    print '{0}: {1},{2}'.format(k,fields[node][k],params[node][k].value)
+                    result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
+                    break
+
+            # Check if new IP assignment, and if new IP is already assigned
+            if len(result) == 0 and params["nicips.ens1f0"].value != fields[node]["nicips.ens1f0"]:
+                command=[ "nodels", "nics.nicips=~!{ip}$".format(ip=params["nicips.ens1f0"].value) ]
+                fd=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE).stdout
+                line=fd.readline().strip()
+                if line:
+                    result.append('"error" : {{"code" : 32, "message" : "{ip} already assigned to {n}."}}'.format(ip=params["nicips.ens1f0"].value,n=line))
+
+            if len(result) == 0:
+                # All checks passed. Do your magic:
+                # Remove dhcp,dns,hosts entries
+                print "makedhcp -d {0},{0}-ilo".format(node)
+                print "makedns -d {0},{0}-ilo".format(node)
+                print "makehosts -d {0},{0}-ilo".format(node)
+                # Rename node and ilo
+                print "chdef -t node -o {o} -n {n}".format(o=node,n=newnode)
+                print "chdef -t node -o {o}-ilo -n {n}-ilo".format(o=node,n=newnode)
+                # Change mac-associated names
+                mac="'{eno1}!{n}-priv|{ens1f0}!{n}-pub'".format(n=newnode,eno1=params["eno1"].value,ens1f0=params["ens1f0"].value)
+                print "chdef -t node {n} 'mac={m}'".format(n=newnode,m=mac)
+                # Remake dhcp,dns,hosts entries
+                if not params["nicips.ens1f0"].value == fields[node]["nicips.ens1f0"]:
+                    print "chdef -t node {n} 'nicips.ens1f0=={newip}'".format(n=newnode,newip=params["nicips.ens1f0"].value)
+                # Remake dhcp,dns,hosts entries
+                print "makehosts {0},{0}-ilo".format(newnode)
+                print "makedns {0},{0}-ilo".format(newnode)
+                print "makedhcp {0},{0}-ilo".format(newnode)
+
+                print "nodeset {n} osimage={osimage}".format(n=newnode,osimage=params["osimage"].value)
+                print "rsetboot {n} net".format(n=newnode)
+                print "power {n} reset".format(n=newnode)
+                result.append('"data": {{ "updated" : "{0}" }}'.format(newnode))
 
 
         ## Expected json form of result
