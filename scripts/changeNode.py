@@ -37,7 +37,7 @@ def main (environ):
     else:
         # Required params found
 
-        command.append('{0},{1}'.format(params['node'].value,params['newname'].value))
+        command.append('{0},{1}'.format(params['node'].value,params['newname'].value.lower()))
         fd=subprocess.Popen(command,
                                 shell=False, stdout=subprocess.PIPE).stdout
         """
@@ -67,7 +67,7 @@ Object name: spare19-a1
         fd.close()
 
         node=params["node"].value
-        newnode=params["newname"].value
+        newnode=params["newname"].value.lower()
         if newnode in fields:
             # Target Node found
             result.append('"error" : {"code" : 32, "message" : "Target node already exists"}')
