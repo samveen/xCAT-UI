@@ -31,14 +31,16 @@ def main (environ):
     for line in fd: 
         if "=" not in line:
             if node != "":
-                if "spare" in fields["node"] and "-ilo" not in fields["node"]:
-                    result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
+                result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
+                fields={}
 
             node=line.split(':',2)[1].strip()
             fields={"node":node}
         else:
             key,val=line.strip().split('=',2)
             fields[key]=val
+    # Last node results:
+    result.append('{{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
 
     # Get results and convert to expected json for each row
     ## Expected json form of array of row dicts
