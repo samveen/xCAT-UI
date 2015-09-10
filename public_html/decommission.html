@@ -9,7 +9,7 @@
     <meta name="author" content="Samveen">
     <link rel="icon" href="/favicon.ico">
 
-    <title>Add Node</title>
+    <title>Decommission Node</title>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/node.css">
@@ -51,7 +51,7 @@
        <div class="col-xs-8 col-md-8">
        <form id="updateForm">
          <div class="panel panel-default">
-           <div class="panel-heading">Assign Node</div>
+           <div class="panel-heading">Decommission Node</div>
            <div class="panel-body">
              <div class="row">
                <div class="col-md-4">
@@ -64,9 +64,9 @@
                </div>
                <div class="col-md-8">
                  <div class="form-group">
-                   <label class="control-label">Post-provisioning Name ( <span class="glyphicon glyphicon-pencil"></span> )</label>
+                   <label class="control-label">Post-decommission Name (may change)</label>
                    <div class="controls">
-                     <input type="text" class="form-control" placeholder="New Name: DcVtrEnvRoleIndex" id="newname" name="newname">
+                     <input type="text" class="form-control" placeholder="New Name: spare123" id="newname" name="newname" readonly>
                    </div>
                  </div>
                </div>
@@ -108,34 +108,7 @@
                  <div class="form-group"><label class="control-label">MAC: Public</label><div class="controls"><input type="text" class="form-control" placeholder="Mac" id='ens1f0' name='ens1f0' readonly></div></div>
                </div>
                <div class="col-md-3">
-                 <div class="form-group"><label class="control-label">IP: Public ( <span class="glyphicon glyphicon-pencil"></span> )</label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='nicips.ens1f0' name='nicips.ens1f0'></div></div>
-               </div>
-             </div>
-             <div class="row">
-               <div class="col-md-6">
-                 <div class="form-group">
-                   <label class="control-label">xCAT OS Profile ( <span class="glyphicon glyphicon-pencil"></span> )</label>
-                   <div class="dropdown">
-                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="osimage" name="osimage">Select OS Profile ...<span class="caret"></span></button>
-                     <input class="data-holder hidden" id="osimage" name="osimage">
-                     <ul id="osimageDropdown" class="dropdown-menu" aria-labelledby="osimageBtn">
-                       <!-- <li><a href="#">WeirdOS - Random Use</a></li> -->
-                     </ul>
-                   </div>
-                 </div>
-               </div>
-               <div class="col-md-6">
-                 <div class="form-group">
-                   <label class="control-label">Node Group ( <span class="glyphicon glyphicon-pencil"></span> )</label>
-                   <!-- div class="controls"><input type="text" class="form-control" placeholder="Group" id='group' name='group'></div -->
-                   <div class="dropdown">
-                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="groupBtn" name="groupBtn">Select Target Group ...<span class="caret"></span></button>
-                     <input class="data-holder hidden" id="group" name="group">
-                     <ul id="groupDropdown" class="dropdown-menu" aria-labelledby="groupBtn">
-                       <!-- <li><a href="#">LZD-WRD-MAIN</a></li> -->
-                     </ul>
-                   </div>
-                 </div>
+                 <div class="form-group"><label class="control-label">IP: Public ( <span class="glyphicon glyphicon-trash"></span> )</label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='nicips.ens1f0' name='nicips.ens1f0' readonly></div></div>
                </div>
              </div>
            </div>
