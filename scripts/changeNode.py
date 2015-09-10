@@ -8,6 +8,11 @@ from conf import config
 import cgi
 import subprocess
 
+def process_cmd(cmd):
+    print cmd
+    fd=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout
+    line=fd.readline().strip()
+
 def main (environ):
     """ Reads the query string and updates node fields as per values
     """
@@ -96,30 +101,53 @@ Object name: spare19-a1
 
             if len(result) == 0:
                 # All checks passed. Do your magic:
+
                 # Remove dhcp,dns,hosts entries
-                print ["makedhcp","-d","{0},{0}-ilo".format(node)]
-                print ["makedns","-d","{0},{0}-ilo".format(node)]
-                print ["makehosts","-d","{0},{0}-ilo".format(node)]
+                command=["makedhcp","-d","{0},{0}-ilo".format(node)]
+                process_cmd(cmd=command)
+                command=["makedns","-d","{0},{0}-ilo".format(node)]
+                process_cmd(cmd=command)
+                command=["makehosts","-d","{0},{0}-ilo".format(node)]
+                process_cmd(cmd=command)
+
                 # Rename node and ilo
-                print ["chdef","-t","node","-o","{o}".format(o=node),"-n","{n}".format(n=newnode)]
-                print ["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
+                command=["chdef","-t","node","-o","{o}".format(o=node),"-n","{n}".format(n=newnode)]
+                process_cmd(cmd=command)
+                command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
+                process_cmd(cmd=command)
+
                 # Change groups to remove uatprovision and add new group
-                print ["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
-                print ["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["group"].value)]
+                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
+                process_cmd(cmd=command)
+                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["group"].value)]
+                process_cmd(cmd=command)
+
                 # Change mac-associated names
                 mac="{eno1}!{n}-priv|{ens1f0}!{n}-pub".format(n=newnode,eno1=params["eno1"].value,ens1f0=params["ens1f0"].value)
-                print ["chdef","-t","node","{n}".format(n=newnode),"mac={m}".format(m=mac)]
+                command=["chdef","-t","node","{n}".format(n=newnode),"mac={m}".format(m=mac)]
+                process_cmd(cmd=command)
+
                 # Remake dhcp,dns,hosts entries
                 if not params["nicips.ens1f0"].value == fields[node]["nicips.ens1f0"]:
-                    print ["chdef","-t","node","{n}".format(n=newnode),"nicips.ens1f0=={newip}".format(newip=params["nicips.ens1f0"].value)]
-                # Remake dhcp,dns,hosts entries
-                print ["makehosts","{0},{0}-ilo".format(newnode)]
-                print ["makedns","{0},{0}-ilo".format(newnode)]
-                print ["makedhcp","{0},{0}-ilo".format(newnode)]
+                    command=["chdef","-t","node","{n}".format(n=newnode),"nicips.ens1f0={newip}".format(newip=params["nicips.ens1f0"].value)]
+                    process_cmd(cmd=command)
 
-                print ["nodeset","{n}".format(n=newnode),"osimage={osimage}".format(osimage=params["osimage"].value)]
-                print ["rsetboot","{n}".format(n=newnode),"net"]
-                print ["rpower","{n}".format(n=newnode),"reset"]
+                # Remake dhcp,dns,hosts entries
+                command=["makehosts","{0},{0}-ilo".format(newnode)]
+                process_cmd(cmd=command)
+                command=["makedns","{0},{0}-ilo".format(newnode)]
+                process_cmd(cmd=command)
+                command=["makedhcp","{0},{0}-ilo".format(newnode)]
+                process_cmd(cmd=command)
+
+                # Change osimage and start provision process
+                command=["nodeset","{n}".format(n=newnode),"osimage={osimage}".format(osimage=params["osimage"].value)]
+                process_cmd(cmd=command)
+                command=["rsetboot","{n}".format(n=newnode),"net"]
+                process_cmd(cmd=command)
+                command=["rpower","{n}".format(n=newnode),"reset"]
+                process_cmd(cmd=command)
+
                 result.append('"data": {{ "updated" : "{0}" }}'.format(newnode))
 
 
