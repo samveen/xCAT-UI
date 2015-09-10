@@ -216,7 +216,11 @@
         var $table = $("#dataTable");
         // handler for Row click
         $table.on('click-row.bs.table', function (e, row, $element) {
-                location.href= location.origin+"/webui/addNode.html?node="+row.node;
+                if (row["node"].match(/spare/)) {
+                    location.href= location.origin+"/webui/provision.html?node="+row.node;
+                } else {
+                    location.href= location.origin+"/webui/decommission.html?node="+row.node;
+                }
         });
 
         $(document).ready(function() {
