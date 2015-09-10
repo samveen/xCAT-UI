@@ -24,10 +24,11 @@ def main (environ):
         if "=" in line:
             key,val=line.strip().split('=',2)
             for i in val.split(","):
-                if i in counts:
-                    counts[i]=counts[i]+1
-                else:
-                    counts[i]=1
+                if 'DisplayGroups' not in config['getGroups'] or i in config['getGroups']['DisplayGroups']:
+                    if i in counts:
+                        counts[i]=counts[i]+1
+                    else:
+                        counts[i]=1
     result.append('"groups" : [ {0} ]'.format(", ".join(['{{"name":"{k}","count":"{v}"}}'.format(k=k,v=v) for k,v in iter(sorted(counts.iteritems()))])))
     # result.append(' : [ {0} ]'.format(", ".join(['"{i}"'.format(i=i) for i in groups])))
     result.append('"msg" : {"status" : "success"}')
