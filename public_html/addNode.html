@@ -253,9 +253,9 @@
                     $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
                 }
             });
-            // FIREFOX HACK: Fix Dropdown display selection  on form reload
+            // FIREFOX HACK: Fix Dropdown display selection on form reload
             $("input.data-holder.hidden").each(function(){
-                if($(this).value!="") {
+                if($(this).val()!="") {
                     var $btn=$(this).parents(".dropdown").find('.btn');
                     $btn.html($(this).val()+' <span class="caret"></span>');
                 }
