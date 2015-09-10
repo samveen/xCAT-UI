@@ -1,0 +1,5 @@
+TODO:
+* Daemonize server (`make daemon`)
+* Documentation for setting up
+* Refactor configuration to single place
+* Make it more generalized. (EPIC)
