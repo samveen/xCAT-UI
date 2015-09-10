@@ -4,5 +4,15 @@
 """
 
 config={
-    'socket': '../fcgi/fcgi.sock'
+    'socket': '../fcgi/fcgi.sock',
+
+    'getGroups': {
+        'DisplayGroups': [
+            "ID-LZD-ALICE-LIVE", "ID-LZD-ALICE-STAG", "ID-LZD-APPS-LIVE",
+            "ID-LZD-APPS-SHRM", "ID-LZD-APPS-STAG", "ID-SC-APPS",
+            "INFRA-SVC", "uatprovision"
+        ]
+    }
 }
+
+
