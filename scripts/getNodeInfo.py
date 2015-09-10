@@ -82,8 +82,11 @@ Object name: spare19-a1
                         fields[key]=val
 
         if "node" in fields:
-            result.append('"msg" : {"status" : "success", "exception" : ""}')
-            result.append('"node": {{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) if 'mac' not in k else '"{k}": {v}'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
+            if "spare" in fields["node"] and "-ilo" not in fields["node"]:
+                result.append('"msg" : {"status" : "success", "exception" : ""}')
+                result.append('"node": {{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) if 'mac' not in k else '"{k}": {v}'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
+            else: 
+                result.append('"msg" : {"status" : "failure", "exception" : "Node not a spare node"}')
         else: 
             result.append('"msg" : {"status" : "failure", "exception" : "Node not found"}')
 
