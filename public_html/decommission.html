@@ -11,10 +11,8 @@
 
     <title>Decommission Node</title>
     <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/node.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
   </head>
   
   <body>
@@ -49,9 +47,9 @@
 
       <div class="app-main" id="app">
        <div class="col-xs-8 col-md-8">
-       <form id="updateForm">
          <div class="panel panel-default">
            <div class="panel-heading">Decommission Node</div>
+           <form id="updateForm">
            <div class="panel-body">
              <div class="row">
                <div class="col-md-4">
@@ -111,15 +109,15 @@
                  <div class="form-group"><label class="control-label">IP: Public ( <span class="glyphicon glyphicon-trash"></span> )</label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='nicips.ens1f0' name='nicips.ens1f0' readonly></div></div>
                </div>
              </div>
-           </div>
+           </div> <!-- End panel body -->
+           </form>
            <div class="panel-footer">
-             <button id="submit" class="btn btn-primary">Update</button><button class="btn btn-primary pull-right">Cancel</button>
+             <button id="submit" class="btn btn-primary" data-toggle="confirmation">Update</button><button class="btn btn-primary pull-right">Cancel</button>
            </div>
          </div>
-       </form>
        </div>
-     </div>
-    </div>
+      </div>
+    </div> <!-- End Container -->
 
     <!-- About Box -->
     <div id="aboutBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aboutBoxLabel" aria-hidden="true">
@@ -139,6 +137,9 @@
     </div>
     <!-- About Box END-->
 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-confirmation/1.0.3/bootstrap-confirmation.js"></script>
     <script>
       $(function () {
         $(document).ready(function() {
@@ -234,6 +235,15 @@
                 }
             });
             // Form Submit handler
+            // Enable confirmation for submit button
+            $("#app #submit").confirmation({
+                onConfirm: function(){
+                    alert("Yes!!");
+                },
+                onCancel: function(){
+                    history.back();
+                }
+            });
             $("#updateForm #submit").click(function(){
                 $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
                 $.ajax({
