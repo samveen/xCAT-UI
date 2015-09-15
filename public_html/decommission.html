@@ -112,7 +112,7 @@
            </div> <!-- End panel body -->
            </form>
            <div class="panel-footer">
-             <button id="submit" class="btn btn-primary" data-toggle="confirmation">Update</button><button class="btn btn-primary pull-right">Cancel</button>
+             <button id="submit" class="btn btn-primary" data-toggle="confirmation">Update</button><button id="cancel" class="btn btn-primary pull-right">Cancel</button>
            </div>
          </div>
        </div>
@@ -234,35 +234,36 @@
                     $btn.html($(this).val()+' <span class="caret"></span>');
                 }
             });
-            // Form Submit handler
-            // Enable confirmation for submit button
+            // Form Submit handler with confirmation unabled
             $("#app #submit").confirmation({
-                onConfirm: function(){
-                    alert("Yes!!");
-                },
+                btnOkLabel: "Confirm",
+                popout: true,
                 onCancel: function(){
                     history.back();
+                },
+                onConfirm: function(){
+                    $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
+                    $.ajax({
+                        type: "POST",
+                        url: "cgi-bin/decommNode",
+                        data: $('#updateForm').serialize(),
+                        dataType: "json",
+                        success: function(obj) {
+                            if(obj.data) {
+                                $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Decomissioning of "+obj.data.node+" as "+obj.data.updated+" started </div>");
+                            } else {
+                                $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+obj.error.code+": "+obj.error.message+"</div>");
+                            }
+                        },
+                        error: function(x,s,e) {
+                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                        }
+                    });
                 }
             });
-            $("#updateForm #submit").click(function(){
-                $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
-                $.ajax({
-                    type: "POST",
-                    url: "cgi-bin/changeNode",
-                    data: $('#updateForm').serialize(),
-                    dataType: "json",
-                    success: function(obj) {
-                        if(obj.data) {
-                            $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Provisioning for "+obj.data.updated+" started </div>");
-                        } else {
-                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+obj.error.code+": "+obj.error.message+"</div>");
-                        }
-                    },
-                    error: function(x,s,e) {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                    }
-                });
-                return(false);
+            // Anything else
+            $("#app #cancel").click(function(){
+                history.back();
             });
 
             // Anything else
