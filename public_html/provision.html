@@ -139,7 +139,7 @@
            </div> <!-- End panel body -->
            </form>
            <div class="panel-footer">
-             <button id="submit" class="btn btn-primary" data-toggle="confirmation">Update</button><button id="cancel" class="btn btn-primary pull-right">Cancel</button>
+             <button id="update" class="btn btn-primary" type="button" data-toggle="confirmation">Update</button><button id="cancel" class="btn btn-primary pull-right" type="button">Cancel</button>
            </div>
          </div>
        </div>
@@ -262,13 +262,14 @@
                 }
             });
             // Form Submit handler with confirmation unabled
-            $("#app #submit").confirmation({
+            $("#app #update").confirmation({
                 btnOkLabel: "Confirm",
                 popout: true,
                 onCancel: function(){
                     history.back();
                 },
-                onConfirm: function(){
+                onConfirm: function(evt){
+                    evt.preventDefault();
                     $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
                     $.ajax({
                         type: "POST",
@@ -286,6 +287,7 @@
                             $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
                         }
                     });
+                    return false;
                 }
             });
             // Anything else
