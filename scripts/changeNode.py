@@ -21,7 +21,7 @@ def main (environ):
                   "-o"
             ]
 
-    required_params=['serial','node','newname','ip','eno1','ens1f0','nicips.ens1f0','group','osimage']
+    required_params=['serial','node','newname','ip','eno1','ens1f0','nicips.ens1f0','groups','osimage']
     required_fields=['serial','mac','ip','nicips.ens1f0']
     verify_fields=['serial','node','ip','eno1','ens1f0']
 
@@ -119,7 +119,7 @@ Object name: spare19-a1
                 # Change groups to remove uatprovision and add new group
                 command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
                 process_cmd(cmd=command)
-                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["group"].value)]
+                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["groups"].value)]
                 process_cmd(cmd=command)
 
                 # Change mac-associated names
