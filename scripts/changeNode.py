@@ -11,7 +11,8 @@ import subprocess
 def process_cmd(cmd):
     print cmd
     fd=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout
-    line=fd.readline().strip()
+    for line in fd: 
+        pass
 
 def main (environ):
     """ Reads the query string and updates node fields as per values
@@ -92,7 +93,7 @@ Object name: spare19-a1
                     break
 
             # Check if new IP assignment, and if new IP is already assigned
-            if len(result) == 0 and params["nicips.ens1f0"].value != fields[node]["nicips.ens1f0"]:
+            if len(result) == 0 and ( "nicips.ens1f0" not in fields[node] or params["nicips.ens1f0"].value != fields[node]["nicips.ens1f0"]):
                 command=[ "nodels", "nics.nicips=~!{ip}$".format(ip=params["nicips.ens1f0"].value) ]
                 fd=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE).stdout
                 line=fd.readline().strip()
@@ -128,7 +129,7 @@ Object name: spare19-a1
                 process_cmd(cmd=command)
 
                 # Remake dhcp,dns,hosts entries
-                if not params["nicips.ens1f0"].value == fields[node]["nicips.ens1f0"]:
+                if "nicips.ens1f0" not in fields[node] or params["nicips.ens1f0"].value not in fields[node]["nicips.ens1f0"]:
                     command=["chdef","-t","node","{n}".format(n=newnode),"nicips.ens1f0={newip}".format(newip=params["nicips.ens1f0"].value)]
                     process_cmd(cmd=command)
 
