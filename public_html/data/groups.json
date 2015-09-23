@@ -1,6 +1,7 @@
 {
     "data": {
         "groups" : [
+            "INFRA-SVC",
             "ID-LZD-ALICE-LIVE",
             "ID-LZD-ALICE-STAG",
             "ID-LZD-APPS-LIVE",
