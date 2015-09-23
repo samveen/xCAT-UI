@@ -60,7 +60,7 @@ Object name: spare19-a1
     unit=19
 """
         fields={}
-        required_fields=['serial','mac','memory','cputype','bmc','rack','unit','ip','nicips.ens1f0']
+        required_fields=['serial','mac','memory','cputype','bmc','rack','unit','ip','nicips.ens1f0','groups']
         node=""
         for line in fd: 
             if "=" not in line:
@@ -78,6 +78,8 @@ Object name: spare19-a1
                             fields[key]="[ {0} ]".format(",".join(macs))
                         else:
                             fields[key]='[ {{ "name": "eno1", "mac": "{0}"}} ]'.format(val)
+                    elif key in 'groups':
+                        fields[key]=val.split(',')[-1]
                     else:
                         fields[key]=val
 

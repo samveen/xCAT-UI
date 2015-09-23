@@ -22,9 +22,9 @@ def main (environ):
                   "-o"
             ]
 
-    required_params=['serial','node','ip','eno1','ens1f0']
-    required_fields=['serial','mac','ip']
-    verify_fields=['serial','node','ip','eno1','ens1f0']
+    required_params=['serial','node','ip','eno1','ens1f0','groups']
+    required_fields=['serial','mac','ip','nicips.ens1f0','groups']
+    verify_fields=['serial','node','ip','eno1','ens1f0','groups']
 
     params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
     
@@ -43,7 +43,7 @@ def main (environ):
     else:
         # Required params found
 
-        command.append('{0},{1}'.format(params['node'].value,params['newname'].value.lower()))
+        command.append(params['node'].value)
         fd=subprocess.Popen(command,
                                 shell=False, stdout=subprocess.PIPE).stdout
         """
@@ -73,21 +73,21 @@ Object name: spare19-a1
         fd.close()
 
         node=params["node"].value
-        newnode=params["newname"].value.lower()
+        newnode="spareXYZ"
         if newnode in fields:
             # Target Node found
             result.append('"error" : {"code" : 32, "message" : "Target node already exists"}')
         elif node not in fields:
             # Error: node not found
             result.append('"error" : {"code" : 2, "message" : "Node not found"}')
-        elif "spare" not in node:
-            # Error: Node found, but not a spare
-            result.append('"error" : {"code" : 4, "message" : "Node not a spare node"}')
+        elif "spare" in node:
+            # Error: Node found, but a spare
+            result.append('"error" : {"code" : 4, "message" : "Node already a spare node"}')
         else: 
-            # We're dealing with an existing spare node
+            # We're dealing with an existing non-spare node
             # Verify fields
             for k in verify_fields:
-                if k not in fields[node] or fields[node][k] != params[k].value:
+                if k not in fields[node] or params[k].value not in fields[node][k]:
                     print '{0}: {1},{2}'.format(k,fields[node][k],params[node][k].value)
                     result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
                     break
@@ -117,10 +117,10 @@ Object name: spare19-a1
                 command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
                 process_cmd(cmd=command)
 
-                # Change groups to remove uatprovision and add new group
-                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
+                # Change groups to remove remove usage group and add uatprovision
+                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=params["groups"].value)]
                 process_cmd(cmd=command)
-                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["group"].value)]
+                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups=uatprovision"]
                 process_cmd(cmd=command)
 
                 # Change mac-associated names
@@ -142,14 +142,16 @@ Object name: spare19-a1
                 process_cmd(cmd=command)
 
                 # Change osimage and start provision process
-                command=["nodeset","{n}".format(n=newnode),"osimage={osimage}".format(osimage=params["osimage"].value)]
+                command=["nodeset","{n}".format(n=newnode),"osimage={d}".format(d=config['decommNode']['osimage'])]
                 process_cmd(cmd=command)
                 command=["rsetboot","{n}".format(n=newnode),"net"]
+                process_cmd(cmd=command)
+                command=["rpower","{n}".format(n=newnode),"up"]
                 process_cmd(cmd=command)
                 command=["rpower","{n}".format(n=newnode),"reset"]
                 process_cmd(cmd=command)
 
-                result.append('"data": {{ "updated" : "{0}" }}'.format(newnode))
+                result.append('"data": {{ "node":" {0}", "updated" : "{1}" }}'.format(node,newnode))
 
 
         ## Expected json form of result
@@ -170,6 +172,7 @@ Object name: spare19-a1
 
     # Cleanup
     # return the results
+    print "Result: {0}".format(result)
     return result
 
 if __name__ == "__main__":

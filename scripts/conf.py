@@ -12,6 +12,9 @@ config={
             "ID-LZD-APPS-SHRM", "ID-LZD-APPS-STAG", "ID-SC-APPS",
             "INFRA-SVC", "uatprovision"
         ]
+    },
+    'decommNode': {
+        'osimage': 'decommission'
     }
 }
 
