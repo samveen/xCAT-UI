@@ -213,7 +213,8 @@
                         for(index in data.osimages) {
                             $osimage.append('<li><a href="#">'+data.osimages[index]+'</a></li>');
                         }
-                        $(".dropdown-menu li a").click(function(){
+                        $(".dropdown-menu li a").click(function(evt){
+                            evt.preventDefault();
                             var $btn=$(this).parents(".dropdown").find('.btn');
                             $btn.html($(this).text()+' <span class="caret"></span>');
                             var $input=$(this).parents(".dropdown").find('.data-holder');
