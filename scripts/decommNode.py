@@ -10,9 +10,8 @@ import subprocess
 
 def process_cmd(cmd):
     print cmd
-#    fd=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout
-#    for line in fd: 
-#        pass
+#    proc=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
+#    proc.wait()
 
 def main (environ):
     """ Reads the query string and updates node fields as per values
@@ -73,11 +72,18 @@ Object name: spare19-a1
         fd.close()
 
         node=params["node"].value
-        newnode="spareXYZ"
-        if newnode in fields:
-            # Target Node found
-            result.append('"error" : {"code" : 32, "message" : "Target node already exists"}')
-        elif node not in fields:
+        newnode=""
+        index=1;
+        while True:
+            newnode="spare{0}".format(index)
+            proc=subprocess.Popen(['nodels',newnode], shell=False, stdout=subprocess.PIPE)
+            proc.wait()
+            lines = ls_proc.stdout.readlines()
+            if len(lines) == 0:
+                break
+            index+=1;
+
+        if node not in fields:
             # Error: node not found
             result.append('"error" : {"code" : 2, "message" : "Node not found"}')
         elif "spare" in node:

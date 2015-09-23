@@ -83,7 +83,20 @@ Object name: spare19-a1
                     else:
                         fields[key]=val
 
+        # Discover unused spare name    
+        newnode=""
+        index=1;
+        while True:
+            newnode="spare{0}".format(index)
+            proc=subprocess.Popen(['nodels',newnode], shell=False, stdout=subprocess.PIPE)
+            proc.wait()
+            lines = ls_proc.stdout.readlines()
+            if len(lines) == 0:
+                break
+            index+=1;
+
         if "node" in fields:
+            fields['newnode']=newnode
             result.append('"msg" : {"status" : "success", "exception" : ""}')
             result.append('"node": {{ {0} }}'.format(", ".join(['"{k}": "{v}"'.format(k=k,v=v) if 'mac' not in k else '"{k}": {v}'.format(k=k,v=v) for k,v in iter(sorted(fields.iteritems()))])))
         else: 
