@@ -267,6 +267,11 @@
                     return false;
                 }
             });
+            // Remove clickability of readonly elements
+            $.each($("input"), function(ind,$obj){
+                if($obj.hasAttribute('readonly'))
+                    $obj.onfocus=function(){ $(this).blur(); };
+            })
             // Anything else
             $("#app #cancel").click(function(){
                 history.back();
