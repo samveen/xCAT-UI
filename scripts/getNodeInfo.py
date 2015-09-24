@@ -90,7 +90,7 @@ Object name: spare19-a1
             newnode="spare{0}".format(index)
             proc=subprocess.Popen(['nodels',newnode], shell=False, stdout=subprocess.PIPE)
             proc.wait()
-            lines = ls_proc.stdout.readlines()
+            lines = proc.stdout.readlines()
             if len(lines) == 0:
                 break
             index+=1;

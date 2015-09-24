@@ -10,9 +10,8 @@ import subprocess
 
 def process_cmd(cmd):
     print cmd
-    fd=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout
-    for line in fd: 
-        pass
+    proc=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
+    proc.wait()
 
 def main (environ):
     """ Reads the query string and updates node fields as per values
