@@ -10,8 +10,8 @@ import subprocess
 
 def process_cmd(cmd):
     print cmd
-#    proc=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
-#    proc.wait()
+    proc=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
+    proc.wait()
 
 def main (environ):
     """ Reads the query string and updates node fields as per values
@@ -22,7 +22,7 @@ def main (environ):
             ]
 
     required_params=['serial','node','ip','eno1','ens1f0','groups']
-    required_fields=['serial','mac','ip','nicips.ens1f0','groups']
+    required_fields=['serial','mac','ip','nicips.ens1f0','groups','provmethod']
     verify_fields=['serial','node','ip','eno1','ens1f0','groups']
 
     params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
@@ -106,6 +106,13 @@ Object name: spare19-a1
                 if line:
                     result.append('"error" : {{"code" : 32, "message" : "{ip} already assigned to {n}."}}'.format(ip=params["nicips.ens1f0"].value,n=line))
 
+            # get the osimage version string -> to add as group
+            command=["lsdef","-t","osimage","-o","{o}".format(o=fields[node]["provmethod"]),"-i","osvers"]
+            proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
+            proc.wait()
+            lines = proc.stdout.readlines()
+            osgroup=lines[1].strip().partition('=')[2]
+
             if len(result) == 0:
                 # All checks passed. Do your magic:
 
@@ -123,7 +130,9 @@ Object name: spare19-a1
                 command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
                 process_cmd(cmd=command)
 
-                # Change groups to remove remove usage group and add uatprovision
+                # Change groups to remove remove usage and os groups and add uatprovision
+                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=osgroup)]
+                process_cmd(cmd=command)
                 command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=params["groups"].value)]
                 process_cmd(cmd=command)
                 command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups=uatprovision"]

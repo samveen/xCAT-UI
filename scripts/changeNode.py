@@ -99,6 +99,13 @@ Object name: spare19-a1
                 if line:
                     result.append('"error" : {{"code" : 32, "message" : "{ip} already assigned to {n}."}}'.format(ip=params["nicips.ens1f0"].value,n=line))
 
+            # get the osimage version string -> to add as group
+            command=["lsdef","-t","osimage","-o","{o}".format(o=params["osimage"].value),"-i","osvers"]
+            proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
+            proc.wait()
+            lines = proc.stdout.readlines()
+            osgroup=lines[1].strip().partition('=')[2]
+
             if len(result) == 0:
                 # All checks passed. Do your magic:
 
@@ -116,8 +123,10 @@ Object name: spare19-a1
                 command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
                 process_cmd(cmd=command)
 
-                # Change groups to remove uatprovision and add new group
+                # Change groups to remove uatprovision and add new groups
                 command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
+                process_cmd(cmd=command)
+                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=osgroup)]
                 process_cmd(cmd=command)
                 command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["groups"].value)]
                 process_cmd(cmd=command)
