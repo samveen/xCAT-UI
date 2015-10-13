@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/node.css">
+    <link rel="stylesheet" href="css/widetooltips.css">
   </head>
   
   <body>
@@ -106,7 +107,7 @@
                  <div class="form-group"><label class="control-label">MAC: Public</label><div class="controls"><input type="text" class="form-control" placeholder="Mac" id='ens1f0' name='ens1f0' readonly></div></div>
                </div>
                <div class="col-md-3">
-                 <div class="form-group"><label class="control-label">IP: Public ( <span class="glyphicon glyphicon-pencil"></span> )</label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='nicips.ens1f0' name='nicips.ens1f0'></div></div>
+                 <div class="form-group"><label class="control-label">IP: Public ( <span class="glyphicon glyphicon-pencil"></span> ) <a class="netTooltip" data-toggle="tooltip" data-html="true" data-trigger="hover"><span class="glyphicon glyphicon-question-sign"></span></a></label><div class="controls"><input type="text" class="form-control" placeholder="IP" id='nicips.ens1f0' name='nicips.ens1f0'></div></div>
                </div>
              </div>
              <div class="row">
@@ -247,6 +248,33 @@
                             var $input=$(this).parents(".dropdown").find('.data-holder');
                             $input.val($(this).text());
                         }); */
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            // Network info Tooltip
+            $.ajax({
+                type: "GET",
+                url: "cgi-bin/getNetworkInfo",
+                dataType: "json",
+                data: {},
+                success: function(obj) {
+                    if(obj.data) {
+                        var content = "<table><tbody>";
+                        for(i in obj.data.nets) {
+                            content += "<tr>";
+                            for(k in obj.data.nets[i]) {
+                                content += "<td>"+obj.data.nets[i][k]+"&nbsp;</td>";
+                            }
+                            content += "</tr>";
+                        }
+                        content += "</tbody></table>";
+                        
+                        $(".netTooltip").attr('data-original-title',content);
                     } else {
                         $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
                     }
