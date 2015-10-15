@@ -19,10 +19,8 @@
     <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css" -->
 
     <!-- Bootstrap Table Plugin CSS -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css">
-
-    <!-- Bootstrap Datepicker Plugin CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.0/bootstrap-table.min.css">
+    <!-- link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/1.9.1/jquery.contextMenu.min.css" -->
 
     <!-- Custom styles for this template -->
     <link href="css/list.css" rel="stylesheet">
@@ -193,6 +191,20 @@
     </div>
     <!-- End Container for Add URL form -->
 
+    <div id="node-context-menu">
+      <ul class="dropdown-menu" role="menu">
+        <li id='decommission'><a tabindex="-1" name="decomm">Decommission</a></li>
+        <li id='install'><a tabindex="-1" name="reinst">Reinstall OSImage</a></li>
+      </ul>
+    </div>
+
+    <div id="spare-context-menu">
+      <ul class="dropdown-menu" role="menu">
+        <li id='provision'><a tabindex="-1" name="prov">Provision</a></li>
+        <li id='install'><a tabindex="-1" name="inst">Install OSImage</a></li>
+      </ul>
+    </div>
+
     <!-- Bootstrap core JavaScript BEGIN -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -203,32 +215,58 @@
     <!-- Bootstrap core JavaScript END -->
 
     <!-- Bootstrap Table plugin JavaScript -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.0/bootstrap-table.min.js"></script>
 
-    <!-- Bootstrap Datepicker plugin JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- Bootstrap ContextMenu Plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-contextmenu/0.3.3/bootstrap-contextmenu.min.js"></script>
+    <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/1.9.1/jquery.contextMenu.min.js"></script -->
 
+    <!-- Bootstrap Table ContextMenu Plugin JavaScript -->
+    <!-- script src="https://cdn.rawgit.com/prograhammer/bootstrap-table-contextmenu/master/dist/bootstrap-table-contextmenu.min.js"></script -->
 
     <script lang="javascript"> <!-- Custom JS -->
     $(function() {
         //Twitter bootstrap scripts
-        // Delete button handler
-        var $table = $("#dataTable");
-        // handler for Row click
-        $table.on('click-row.bs.table', function (e, row, $element) {
+        $(document).ready(function() {
+            var $table = $("#dataTable");
+            if(location.search.match("\\bgroup=")!=null) 
+                $table.bootstrapTable('refresh', {url: 'cgi-bin/getNodeList?group=' + location.search.split(new RegExp("\\bgroup="))[1]});
+            else
+                $table.bootstrapTable('refresh', {url: 'cgi-bin/getNodeList'});
+
+            $table.on('post-body.bs.table', function (e) {
+                e.preventDefault();
+                $('#dataTable tr').has('td').each(function(index,el) {
+                    menu="";
+                    if ($(el).children()[0].textContent.match(/spare/)) {
+                        menu='#spare-context-menu';
+                    } else {
+                        menu='#node-context-menu';
+                    }
+                    $(el).contextmenu({
+                        target: menu,
+                        onItem: function(ctx,ev) {
+                            location.href= location.origin+"/webui/"+ev.currentTarget.id+".html?node="+$(ctx).children()[0].textContent;
+                            //console.log('ev:');
+                            //console.log(ev);
+                        }
+                    });
+                });
+            });
+
+            // handler for Row click
+            $table.on('click-row.bs.table', function (e, row, $element) {
+                e.preventDefault();
                 if (row["node"].match(/spare/)) {
-                    location.href= location.origin+"/webui/provision.html?node="+row.node;
+                    console.log($element);
+                    //location.href= location.origin+"/webui/provision.html?node="+row.node;
                 } else {
-                    location.href= location.origin+"/webui/decommission.html?node="+row.node;
+                    console.log($element);
+                    //location.href= location.origin+"/webui/decommission.html?node="+row.node;
                 }
+            });
         });
 
-        $(document).ready(function() {
-            if(location.search.match("\\bgroup=")!=null) 
-              $('#dataTable').bootstrapTable('refresh', {url: 'cgi-bin/getNodeList?group=' + location.search.split(new RegExp("\\bgroup="))[1]});
-            else
-              $('#dataTable').bootstrapTable('refresh', {url: 'cgi-bin/getNodeList'});
-        });
 /*
         var $removeBTN = $('#remove');
 
@@ -313,14 +351,7 @@
             });
             return(false);
         });
-
-        // Initializer for Date Picker in "Add form"
-        $('#myModal .input-group.date').datepicker({
-            format: "yyyy-mm-dd",
-            startDate: "Today",
-            startView: 1,
-            autoclose: true
-        }); */
+        */
     });
     </script>
   </body>
