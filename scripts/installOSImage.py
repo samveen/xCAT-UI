@@ -21,7 +21,7 @@ def main (environ):
                   "-o"
             ]
 
-    required_params=['serial','node','ip','eno1','ens1f0','nicips.ens1f0','osimage']
+    required_params=['serial','node','ip','eno1','ens1f0','osimage']
     required_fields=['serial','mac','ip','nicips.ens1f0']
     verify_fields=['serial','node','ip','eno1','ens1f0']
 
