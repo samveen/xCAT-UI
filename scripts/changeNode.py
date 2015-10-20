@@ -163,7 +163,7 @@ Object name: spare19-a1
                 process_cmd(cmd=command)
 
                 # Add comment about UI based Provisioning
-                command=["chdef","-t","node",newnode,"","usercomment=xCAT-UI-NG Based Provisioning at {0}".format(datetime.datetime.utcnow())]
+                command=["chdef","-t","node","-o",newnode,"usercomment=xCAT-UI-NG Based Provisioning at {0}".format(datetime.datetime.utcnow())]
                 process_cmd(cmd=command)
 
                 result.append('"data": {{ "updated" : "{0}" }}'.format(newnode))
