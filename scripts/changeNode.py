@@ -6,6 +6,7 @@
 from conf import config
 
 import cgi
+import datetime
 import subprocess
 
 def process_cmd(cmd):
@@ -109,12 +110,14 @@ Object name: spare19-a1
             if len(result) == 0:
                 # All checks passed. Do your magic:
 
-                # Remove dhcp,dns,hosts entries
+                # Remove dhcp,dns,hosts,conserver entries
                 command=["makedhcp","-d","{0},{0}-ilo".format(node)]
                 process_cmd(cmd=command)
                 command=["makedns","-d","{0},{0}-ilo".format(node)]
                 process_cmd(cmd=command)
                 command=["makehosts","-d","{0},{0}-ilo".format(node)]
+                process_cmd(cmd=command)
+                command=["makeconservercf","-d",node]
                 process_cmd(cmd=command)
 
                 # Rename node and ilo
@@ -141,12 +144,14 @@ Object name: spare19-a1
                     command=["chdef","-t","node","{n}".format(n=newnode),"nicips.ens1f0={newip}".format(newip=params["nicips.ens1f0"].value)]
                     process_cmd(cmd=command)
 
-                # Remake dhcp,dns,hosts entries
+                # Remake dhcp,dns,hosts,conserver entries
                 command=["makehosts","{0},{0}-ilo".format(newnode)]
                 process_cmd(cmd=command)
                 command=["makedns","{0},{0}-ilo".format(newnode)]
                 process_cmd(cmd=command)
                 command=["makedhcp","{0},{0}-ilo".format(newnode)]
+                process_cmd(cmd=command)
+                command=["makeconservercf",newnode]
                 process_cmd(cmd=command)
 
                 # Change osimage and start provision process
@@ -155,6 +160,10 @@ Object name: spare19-a1
                 command=["rsetboot","{n}".format(n=newnode),"net"]
                 process_cmd(cmd=command)
                 command=["rpower","{n}".format(n=newnode),"reset"]
+                process_cmd(cmd=command)
+
+                # Add comment about UI based Provisioning
+                command=["chdef","-t","node",newnode,"","usercomment=xCAT-UI-NG Based Provisioning at {0}".format(datetime.datetime.utcnow())]
                 process_cmd(cmd=command)
 
                 result.append('"data": {{ "updated" : "{0}" }}'.format(newnode))
