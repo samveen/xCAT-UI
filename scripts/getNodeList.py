@@ -8,6 +8,11 @@ from conf import config
 import cgi
 import subprocess
 
+def process_cmd(cmd):
+    print cmd
+    proc=subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
+    proc.wait()
+
 def main (environ):
     """ Reads the DB and returns a json result as a list of strings
     """
@@ -21,6 +26,9 @@ def main (environ):
 
     if "group" in params:
         command.append(params['group'].value)
+        process_cmd(cmd=["nodestat","-u",params['group'].value])
+    else:
+        process_cmd(cmd=["nodestat","-u","all"])
 
     # fields: serial,groups,ip,cputype,memory,rack,unit,currstate,status,statustime
     fd=subprocess.Popen(command,
