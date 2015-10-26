@@ -6,6 +6,7 @@
 from conf import config
 
 import cgi
+import datetime
 import subprocess
 
 def process_cmd(cmd):
@@ -84,19 +85,8 @@ Object name: spare19-a1
                     result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
                     break
 
-            # get the osimage version string -> to add as group
-            command=["lsdef","-t","osimage","-o","{o}".format(o=params["osimage"].value),"-i","osvers"]
-            proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
-            proc.wait()
-            lines = proc.stdout.readlines()
-            osgroup=lines[1].strip().partition('=')[2]
-
             if len(result) == 0:
                 # All checks passed. Do your magic:
-
-                # Change groups to add osgroup
-                command=["chdef","-t","node","{n}".format(n=node),"-p","groups={g}".format(g=osgroup)]
-                process_cmd(cmd=command)
 
                 # Change osimage and start provision process
                 command=["nodeset","{n}".format(n=node),"osimage={osimage}".format(osimage=params["osimage"].value)]
@@ -104,6 +94,10 @@ Object name: spare19-a1
                 command=["rsetboot","{n}".format(n=node),"net"]
                 process_cmd(cmd=command)
                 command=["rpower","{n}".format(n=node),"reset"]
+                process_cmd(cmd=command)
+
+                # Add comment about UI based Provisioning
+                command=["chdef","-t","node","-o",node,"usercomment=xCAT-UI-NG based OSImage install at {0}".format(datetime.datetime.utcnow())]
                 process_cmd(cmd=command)
 
                 result.append('"data": {{ "node" : "{0}", "osimage": "{1}" }}'.format(node,params["osimage"].value))
