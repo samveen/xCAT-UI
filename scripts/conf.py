@@ -14,7 +14,7 @@ config={
         ]
     },
     'decommNode': {
-        'osimage': 'decommission'
+        'osimage': 'centos7.1-x86_64-install-decommission'
     }
 }
 

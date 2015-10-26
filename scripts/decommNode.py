@@ -98,15 +98,7 @@ Object name: spare19-a1
                     result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
                     break
 
-            # Check if new IP assignment, and if new IP is already assigned
-            if len(result) == 0 and params["nicips.ens1f0"].value != fields[node]["nicips.ens1f0"]:
-                command=[ "nodels", "nics.nicips=~!{ip}$".format(ip=params["nicips.ens1f0"].value) ]
-                fd=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE).stdout
-                line=fd.readline().strip()
-                if line:
-                    result.append('"error" : {{"code" : 32, "message" : "{ip} already assigned to {n}."}}'.format(ip=params["nicips.ens1f0"].value,n=line))
-
-            # get the osimage version string -> to add as group
+            # get the osimage version string -> to remove from groups
             command=["lsdef","-t","osimage","-o","{o}".format(o=fields[node]["provmethod"]),"-i","osvers"]
             proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
             proc.wait()
@@ -130,7 +122,7 @@ Object name: spare19-a1
                 command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
                 process_cmd(cmd=command)
 
-                # Change groups to remove remove usage and os groups and add uatprovision
+                # Change groups to remove business and os groups and add uatprovision
                 command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=osgroup)]
                 process_cmd(cmd=command)
                 command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=params["groups"].value)]
@@ -143,9 +135,9 @@ Object name: spare19-a1
                 command=["chdef","-t","node","{n}".format(n=newnode),"mac={m}".format(m=mac)]
                 process_cmd(cmd=command)
 
-                # Remake dhcp,dns,hosts entries
-                if not params["nicips.ens1f0"].value == fields[node]["nicips.ens1f0"]:
-                    command=["chdef","-t","node","{n}".format(n=newnode),"nicips.ens1f0={newip}".format(newip=params["nicips.ens1f0"].value)]
+                # Remove business group based IP
+                if "nicips.ens1f0" in fields[node]:
+                    command=["chdef","-t","node",newnode,"nicips.ens1f0="]
                     process_cmd(cmd=command)
 
                 # Remake dhcp,dns,hosts entries
@@ -164,6 +156,10 @@ Object name: spare19-a1
                 command=["rpower","{n}".format(n=newnode),"up"]
                 process_cmd(cmd=command)
                 command=["rpower","{n}".format(n=newnode),"reset"]
+                process_cmd(cmd=command)
+
+                # Add comment about UI based decommission
+                command=["chdef","-t","node",newnode,"","usercomment=xCAT-UI-NG Based Decommission"]
                 process_cmd(cmd=command)
 
                 result.append('"data": {{ "node":" {0}", "updated" : "{1}" }}'.format(node,newnode))
