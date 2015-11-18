@@ -1,0 +1,3 @@
+[submodule "scripts/conf"]
+	path = scripts/conf
+	url = git@github.com:samveen/xCAT-UI-conf.git
