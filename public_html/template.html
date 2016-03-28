@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="xCAT Page Template">
+    <meta name="author" content="Samveen">
+    <link rel="icon" href="images/favicon.ico">
+
+    <title>Login - xCAT UI NextGen</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/navbar.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">xCAT UI NextGen</a>
+          </div> <!-- /.navbar-header -->
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="#">Home</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><p class="navbar-btn"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  <span class='glyphicon glyphicon-user'></span> <span id='uid'></span> <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a role="button" id='logout'>Logout</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <div id="msgs"></div>
+
+      <div class="app-main" class="fade" role="application" aria-labelledby='appLabel' aria-hidden="true" hidden>
+        <h1 id="appLabel">Node List</h1>
+      </div>
+
+    </div><!-- /.container -->
+   
+    <div id="aboutBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aboutBoxLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="aboutBoxLabel">Built by Samveen &lt;infra@Lazada.com&gt;</h3>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login form Modal -->
+    <div id="myLoginModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="myLoginModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-signin">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myLoginModalLabel">xCAT-UI-NG Login</h3>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                <label for="type">Username</label>
+                <input type="text" name="inputUsername" class="form-control" placeholder="Username" required autofocus>
+              </div>
+              <div class="form-group">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" name="inputPassword" class="form-control" placeholder="Password" required>
+              </div>
+              <div class="form-group">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                  </label>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-lg btn-primary btn-block" type="submit" id="submit">Sign in</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- End Login form Modal -->
+
+    <!-- Bootstrap core JavaScript BEGIN -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript END -->
+
+    <script lang="javascript"> <!-- Custom JS -->
+
+    // Page Application Setup/Init function: Called post auth.
+    var App=function(){
+        console.log("App function called");
+        // Logout button handler
+        jQuery("#logout").click(function(evt){
+            evt.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/doLogout",
+                data: "",
+                dataType: "json",
+                success: function(obj) {
+                    window.location.assign("groups.html");
+                },
+                error: function(x,s,e) {
+                    $("#myLoginModal").modal('hide');
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+        });
+        // Show the app
+        $(".app-main").attr("aria-hidden","false").show();
+        // All post auth page initialization goes here
+    };
+
+    // Auth
+    $(function() {
+        // Auth Event flow tracker variable
+        var lastEvent='';
+
+        // Modal close action
+         $('#myLoginModal').on('hidden.bs.modal', function (event) {
+             setTimeout(function() { location.reload();}, 3000);
+         })
+
+        // Setup login Form Submit handler
+        $("#myLoginModal").submit(function(evt){
+            console.log(evt.type);
+            lastEvent='modal.submit';
+            evt.preventDefault();
+            $("#myLoginModal").modal('hide');
+            $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Processing Login...</div>");
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/doLogin",
+                data: $('#myLoginModal form').serialize(),
+                dataType: "json",
+                success: function(obj) {
+                    if("data" in obj) {
+                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.data.status+"</div>");
+                        $("#myLoginModal form")[0].reset();
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.error.code+": "+obj.error.message+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            return(true);
+        });
+
+        // Check if isAuthenticated ();
+        $.ajax({
+            type: "POST",
+            url: "cgi-bin/isAuthenticated",
+            data: '',
+            dataType: "json",
+            success: function(obj) {
+                if("data" in obj) {
+                    $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Welcome, "+obj.data.uid+"</div>");
+                    $('#uid').html(obj.data.displayName);
+                    App();
+                } else {
+                    $("#myLoginModal").modal('show');
+                }
+            },
+            error: function(x,s,e) {
+                $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                setTimeout(function() { location.reload();}, 3000);
+            }
+        });
+    });
+    </script>
+  </body>
+</html>
