@@ -5,12 +5,19 @@
 
 from conf import config
 
+import re
+
 import subprocess
 import itertools
 
 def main (environ):
     """ Reads the groups and returns a json result as a list of strings
     """
+
+    pattern = None
+    if 'DisplayGroups' in config['getGroups']:
+        print config['getGroups']['DisplayGroups']
+        pattern = re.compile(config['getGroups']['DisplayGroups'])
 
     result=[]
 
@@ -22,7 +29,7 @@ def main (environ):
         """
         for gline, mline in itertools.izip(fd,fd):
             name=gline.strip().split(':',2)[1].strip()
-            if 'DisplayGroups' not in config['getGroups'] or name in config['getGroups']['DisplayGroups']:
+            if 'DisplayGroups' not in config['getGroups'] or pattern.match(name):
                 count=len(mline.strip().split('=',2)[1].strip().split(','))
                 result.append('{{"name":"{n}","count":"{c}"}}'.format(n=name,c=count))
         result=['"data":{{\n"groups" : [ {0} ]'.format(', '.join(result))]
