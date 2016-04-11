@@ -16,7 +16,6 @@ def main (environ):
 
     pattern = None
     if 'DisplayGroups' in config['getGroups']:
-        print config['getGroups']['DisplayGroups']
         pattern = re.compile(config['getGroups']['DisplayGroups'])
 
     result=[]
