@@ -12,6 +12,7 @@
     <title>Add Node</title>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="css/node.css">
     <link rel="stylesheet" href="css/widetooltips.css">
   </head>
@@ -114,26 +115,14 @@
                <div class="col-md-6">
                  <div class="form-group">
                    <label class="control-label">xCAT OS Profile ( <span class="glyphicon glyphicon-pencil"></span> )</label>
-                   <div class="dropdown">
-                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="osimage" name="osimage">Select OS Profile ...<span class="caret"></span></button>
-                     <input class="data-holder hidden" id="osimage" name="osimage">
-                     <ul id="osimageDropdown" class="dropdown-menu" aria-labelledby="osimageBtn">
-                       <!-- <li><a href="#">WeirdOS - Random Use</a></li> -->
-                     </ul>
-                   </div>
+                   <select class="selectpicker" name="osimage" id="osimage"></select>
                  </div>
                </div>
                <div class="col-md-6">
                  <div class="form-group">
-                   <label class="control-label">Node Group ( <span class="glyphicon glyphicon-pencil"></span> )</label>
-                   <!-- div class="controls"><input type="text" class="form-control" placeholder="Groups" id='groups' name='groups'></div -->
-                   <div class="dropdown">
-                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="groupsBtn" name="groupsBtn">Select Target Group ...<span class="caret"></span></button>
-                     <input class="data-holder hidden" id="groups" name="groups">
-                     <ul id="groupsDropdown" class="dropdown-menu" aria-labelledby="groupsBtn">
-                       <!-- <li><a href="#">LZD-WRD-MAIN</a></li> -->
-                     </ul>
-                   </div>
+                   <label class="control-label">Node Groups ( <span class="glyphicon glyphicon-pencil"></span> )</label>
+                   <select class="selectpicker" name="groupSelect" id="groupSelect" multiple></select>
+                   <input class="data-holder hidden" id="groups" name="groups">
                  </div>
                </div>
              </div>
@@ -168,39 +157,37 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-confirmation/1.0.3/bootstrap-confirmation.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
     <script>
       $(function () {
         $(document).ready(function() {
             // Enable tooltip 
             $('[data-toggle="tooltip"]').tooltip()
-            // Load Node data into form
-            if(location.search.match("\\bnode=")!=null) {
-                $.ajax({
-                    type: "GET",
-                    url: "cgi-bin/getSpareNodeInfo",
-                    dataType: "json",
-                    data: 'node='+location.search.split(new RegExp("\\bnode="))[1].split('&')[0],
-                    success: function(data) {
-                        if(data.msg.status==='Success' || data.msg.status==='success') {
-                            for(var k in data.node) {
-                                if(k==='mac') {
-                                    for(var m in data.node[k]) {
-                                        $('#'+data.node[k][m].name).val(data.node[k][m].mac);
-                                    }
-                                } else {
-                                    $("[id='"+k+"']").val(data.node[k]);
-                                }
-                            }
-                        } else {
-                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
+            // load groups into form
+            $.ajax({
+                type: "GET",
+                url: "cgi-bin/getGroups",
+                dataType: "json",
+                data: {},
+                async: false,
+                success: function(obj) {
+                    if(obj.data) {
+                        var $groupSel = $("#groupSelect");
+                        for(index in obj.data.groups) {
+                            $groupSel.append(new Option(obj.data.groups[index].name, obj.data.groups[index].name));
                         }
-                    },
-                    error: function(x,s,e) {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                        $groupSel.selectpicker('refresh');
+                        $groupSel.on('changed.bs.select', function (e,i,nv,ov) {
+                            $("#groups").val($groupSel.selectpicker('val').join(","));
+                        });
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
                     }
-                });
-            } else
-                alert("No Node selected");
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
             // Load osimage into form
             $.ajax({
                 type: "GET",
@@ -210,46 +197,13 @@
                 success: function(data) {
                     if(data.msg.status==='Success' || data.msg.status==='success') {
                         //$('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+"</div>");
-                        var $osimage = $("#osimageDropdown");
+                        var $osimageSel = $("#osimage");
                         for(index in data.osimages) {
-                            $osimage.append('<li><a href="#">'+data.osimages[index]+'</a></li>');
+                            $osimageSel.append(new Option(data.osimages[index], data.osimages[index]));
                         }
-                        $(".dropdown-menu li a").click(function(evt){
-                            evt.preventDefault();
-                            var $btn=$(this).parents(".dropdown").find('.btn');
-                            $btn.html($(this).text()+' <span class="caret"></span>');
-                            var $input=$(this).parents(".dropdown").find('.data-holder');
-                            $input.val($(this).text());
-                        });
+                        $osimageSel.selectpicker('refresh');
                     } else {
                         $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.error.code+": "+obj.error.message+"</div>");
-                    }
-                },
-                error: function(x,s,e) {
-                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                }
-            });
-            // Target groups
-            $.ajax({
-                type: "GET",
-                url: "data/groups.json",
-                dataType: "json",
-                data: {},
-                success: function(obj) {
-                    if(obj.data) {
-                        var $groups = $("#groupsDropdown");
-                        for(index in obj.data.groups) {
-                            $groups.append('<li><a href="#">'+obj.data.groups[index]+'</a></li>');
-                        }
-                        /* Already done above. If not, doesn't matter anyway since we cannot submit form successfully.
-                        $(".dropdown-menu li a").click(function(){
-                            var $btn=$(this).parents(".dropdown").find('.btn');
-                            $btn.html($(this).text()+' <span class="caret"></span>');
-                            var $input=$(this).parents(".dropdown").find('.data-holder');
-                            $input.val($(this).text());
-                        }); */
-                    } else {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
                     }
                 },
                 error: function(x,s,e) {
@@ -283,14 +237,40 @@
                     $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
                 }
             });
-            // FIREFOX HACK: Fix Dropdown display selection on form reload
-            $("input.data-holder.hidden").each(function(){
-                if($(this).val()!="") {
-                    var $btn=$(this).parents(".dropdown").find('.btn');
-                    $btn.html($(this).val()+' <span class="caret"></span>');
-                }
-            });
-            // Form Submit handler with confirmation unabled
+            // Load Node data into form - Last?
+            if(location.search.match("\\bnode=")!=null) {
+                $.ajax({
+                    type: "GET",
+                    url: "cgi-bin/getSpareNodeInfo",
+                    dataType: "json",
+                    data: 'node='+location.search.split(new RegExp("\\bnode="))[1].split('&')[0],
+                    success: function(data) {
+                        if(data.msg.status==='Success' || data.msg.status==='success') {
+                            for(var k in data.node) {
+                                if(k==='mac') {
+                                    for(var m in data.node[k]) {
+                                        $('#'+data.node[k][m].name).val(data.node[k][m].mac);
+                                    }
+                                } else if(k==='groups') {
+                                    var $groupSel = $("#groupSelect");
+                                    var g = data.node[k].split(',');
+                                    $groupSel.selectpicker('val',g);
+                                    $("#groups").val($groupSel.selectpicker('val').join(","));
+                                } else {
+                                    $("[id='"+k+"']").val(data.node[k]);
+                                }
+                            }
+                        } else {
+                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
+                        }
+                    },
+                    error: function(x,s,e) {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                    }
+                });
+            } else
+                alert("No Node selected");
+            // Form Submit handler with confirmation enabled
             $("#app #update").confirmation({
                 btnOkLabel: "Confirm",
                 popout: true,

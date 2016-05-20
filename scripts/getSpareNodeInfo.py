@@ -60,7 +60,7 @@ Object name: spare19-a1
     unit=19
 """
         fields={}
-        required_fields=['serial','mac','memory','cputype','bmc','rack','unit','ip','nicips.ens1f0']
+        required_fields=['serial','mac','memory','cputype','bmc','rack','unit','ip','nicips.ens1f0','groups']
         node=""
         for line in fd: 
             if "=" not in line:

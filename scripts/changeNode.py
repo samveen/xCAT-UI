@@ -23,7 +23,7 @@ def main (environ):
             ]
 
     required_params=['serial','node','newname','ip','eno1','ens1f0','nicips.ens1f0','groups','osimage']
-    required_fields=['serial','mac','ip','nicips.ens1f0']
+    required_fields=['serial','mac','ip','nicips.ens1f0','groups']
     verify_fields=['serial','node','ip','eno1','ens1f0']
 
     params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
@@ -32,10 +32,10 @@ def main (environ):
 
     fields={}
 
-        # Check required params
+    # Check required params
     missing=[]
     for k in required_params:
-        if k not in params or not params[k].value:
+        if k not in params:
             missing.append(k)
     if len(missing) > 0:
         # Required params not found
@@ -100,24 +100,17 @@ Object name: spare19-a1
                 if line:
                     result.append('"error" : {{"code" : 32, "message" : "{ip} already assigned to {n}."}}'.format(ip=params["nicips.ens1f0"].value,n=line))
 
-            # get the osimage version string -> to add as group
-            command=["lsdef","-t","osimage","-o","{o}".format(o=params["osimage"].value),"-i","osvers"]
-            proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
-            proc.wait()
-            lines = proc.stdout.readlines()
-            osgroup=lines[1].strip().partition('=')[2]
-
             if len(result) == 0:
                 # All checks passed. Do your magic:
 
                 # Remove dhcp,dns,hosts,conserver entries
+                command=["makeconservercf","-d",node]
+                process_cmd(cmd=command)
                 command=["makedhcp","-d","{0},{0}-ilo".format(node)]
                 process_cmd(cmd=command)
                 command=["makedns","-d","{0},{0}-ilo".format(node)]
                 process_cmd(cmd=command)
                 command=["makehosts","-d","{0},{0}-ilo".format(node)]
-                process_cmd(cmd=command)
-                command=["makeconservercf","-d",node]
                 process_cmd(cmd=command)
 
                 # Rename node and ilo
@@ -126,10 +119,8 @@ Object name: spare19-a1
                 command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
                 process_cmd(cmd=command)
 
-                # Change groups to remove uatprovision and add new groups
-                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups=uatprovision"]
-                process_cmd(cmd=command)
-                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=osgroup)]
+                # Change groups to remove old groups and add newly requested groups (TODO: deltas instead of all)
+                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=fields[node]["groups"])]
                 process_cmd(cmd=command)
                 command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["groups"].value)]
                 process_cmd(cmd=command)
