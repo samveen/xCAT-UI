@@ -6,3 +6,9 @@ Essential reading:
 * http://xcat.org/
 * http://github.com/xcat2/xcat-core
 * http://google.github.io/styleguide/jsoncstyleguide.xml
+
+Requirements:
+* python-2.7.5
+* python-flup
+* python-beaker
+* python-pam
