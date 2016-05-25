@@ -78,8 +78,8 @@ Object name: spare19-a1
                             fields[key]="[ {0} ]".format(",".join(macs))
                         else:
                             fields[key]='[ {{ "name": "eno1", "mac": "{0}"}} ]'.format(val)
-                    elif key in 'groups':
-                        fields[key]=val.split(',')[-1]
+                    #elif key in 'groups':
+                    #    fields[key]=val.split(',')[-1]
                     else:
                         fields[key]=val
 

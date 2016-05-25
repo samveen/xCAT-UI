@@ -23,7 +23,7 @@ def main (environ):
 
     required_params=['serial','node','ip','eno1','ens1f0','groups']
     required_fields=['serial','mac','ip','nicips.ens1f0','groups','provmethod']
-    verify_fields=['serial','node','ip','eno1','ens1f0','groups']
+    verify_fields=['serial','node','ip','eno1','ens1f0']
 
     params=cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ);
     
@@ -34,7 +34,7 @@ def main (environ):
     # Check required params
     missing=[]
     for k in required_params:
-        if k not in params or not params[k].value:
+        if k not in params:
             missing.append(k)
     if len(missing) > 0:
         # Required params not found
@@ -98,12 +98,12 @@ Object name: spare19-a1
                     result.append('"error" : {{"code" : 16, "message" : "Node data mismatch on {0}."}}'.format(k))
                     break
 
-            # get the osimage version string -> to remove from groups
-            command=["lsdef","-t","osimage","-o","{o}".format(o=fields[node]["provmethod"]),"-i","osvers"]
-            proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
-            proc.wait()
-            lines = proc.stdout.readlines()
-            osgroup=lines[1].strip().partition('=')[2]
+            ## get the osimage version string -> to remove from groups
+            #command=["lsdef","-t","osimage","-o","{o}".format(o=fields[node]["provmethod"]),"-i","osvers"]
+            #proc=subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
+            #proc.wait()
+            #lines = proc.stdout.readlines()
+            #osgroup=lines[1].strip().partition('=')[2]
 
             if len(result) == 0:
                 # All checks passed. Do your magic:
@@ -122,12 +122,10 @@ Object name: spare19-a1
                 command=["chdef","-t","node","-o","{o}-ilo".format(o=node),"-n","{n}-ilo".format(n=newnode)]
                 process_cmd(cmd=command)
 
-                # Change groups to remove business and os groups and add uatprovision
-                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=osgroup)]
+                # Change groups to remove existing groups and to add newly supplied groups (change to delta)
+                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=fields[node]["groups"])]
                 process_cmd(cmd=command)
-                command=["chdef","-t","node","{n}".format(n=newnode),"-m","groups={g}".format(g=params["groups"].value)]
-                process_cmd(cmd=command)
-                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups=uatprovision"]
+                command=["chdef","-t","node","{n}".format(n=newnode),"-p","groups={g}".format(g=params["groups"].value)]
                 process_cmd(cmd=command)
 
                 # Change mac-associated names
