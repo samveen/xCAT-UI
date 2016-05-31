@@ -26,44 +26,46 @@
 
   <body>
     <div class="container">
-
-      <!-- Static navbar -->
-      <nav class="navbar navbar-default">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">xCAT UI NextGen</a>
-          </div> <!-- /.navbar-header -->
-          <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              <li><a href="#">Home</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><p class="navbar-btn"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  <span class='glyphicon glyphicon-user'></span> <span id='uid'></span> <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a role="button" id='logout'>Logout</a></li>
-                </ul>
-              </li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div><!--/.container-fluid -->
-      </nav>
+      <header>
+        <!-- Static navbar -->
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">xCAT UI NextGen</a>
+            </div><!-- /.navbar-header -->
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="#">Home</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li><p class="navbar-btn"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span class='glyphicon glyphicon-user'></span> <span id='uid'></span> <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a role="button" id='logout'>Logout</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div><!--/.container-fluid -->
+        </nav>
+      </header>
 
       <div id="msgs"></div>
 
-      <div class="app-main" class="fade" role="application" aria-labelledby='appLabel' aria-hidden="true" hidden>
-        <h1 id="appLabel">Node List</h1>
-      </div>
-    </div> <!-- /.container -->
+      <div class="app-main" role="application" aria-labelledby="appLabel" aria-hidden="true" hidden>
+        <h1 id="appLabel">App Title</h1>
+      </div><!-- /.app-main -->
+
+    </div><!-- /.container -->
 
     <!-- About Box -->
     <div id="aboutBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aboutBoxLabel" aria-hidden="true">
@@ -71,7 +73,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="aboutBoxLabel">Built by Samveen &lt;infra@Lazada.com&gt;</h3>
+            <h3 id="aboutBoxLabel">Built by Samveen &lt;samveenATsamveenDOTin&gt;</h3>
           </div>
           <div class="modal-body">
           </div>
@@ -120,18 +122,15 @@
 
     <!-- Bootstrap core JavaScript BEGIN -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script type="text/javascript" type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script type="text/javascript" src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
     <!-- Bootstrap core JavaScript END -->
 
     <script type="text/javascript"> <!-- Custom JS -->
-
     // Page Application Setup/Init function: Called post auth.
     var App=function(){
-        console.log("App function called");
         // Logout button handler
         jQuery("#logout").click(function(evt){
             evt.preventDefault();
@@ -152,7 +151,10 @@
         // Show the app
         $(".app-main").attr("aria-hidden","false").show();
         // All post auth page initialization goes here
+        // Correct the title
+        document.title = "xCAT Template page";
     };
+    // End - Page Application Setup/Init function
 
     // Auth
     $(function() {

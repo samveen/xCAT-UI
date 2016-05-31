@@ -130,10 +130,9 @@
     <script type="text/javascript" src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
     <!-- Bootstrap core JavaScript END -->
     <!-- Bootstrap Table plugin JavaScript -->
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.0/bootstrap-table.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.0/bootstrap-table.min.js"></script>
 
     <script type="text/javascript"> <!-- Custom JS -->
-
     // Page Application Setup/Init function: Called post auth.
     var App=function(){
         // Logout button handler
@@ -158,7 +157,7 @@
         // All post auth page initialization goes here
         // Correct the title
         document.title = "xCAT Groups list";
-
+        // Load groups into list
         $.ajax({
             type: "GET",
             url: "cgi-bin/getGroups",
