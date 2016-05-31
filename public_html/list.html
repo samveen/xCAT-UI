@@ -5,15 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+    <meta name="description" content="xCAT Node list">
+    <meta name="author" content="Samveen">
+    <link rel="icon" href="images/favicon.ico">
 
-    <title>Discovered Node List</title>
+    <title>Login - xCAT UI NextGen</title>
 
     <!-- Bootstrap core CSS -->
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
     <!-- Optional theme. Disable? -->
     <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css" -->
@@ -24,6 +23,7 @@
 
     <!-- Custom styles for this template -->
     <link href="css/list.css" rel="stylesheet">
+    <link href="css/navbar.css" rel="stylesheet">
 
     <!-- HTML5 Shiv and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -33,43 +33,44 @@
   </head>
 
   <body>
-
-    <!-- Static navbar -->
-    <nav class="navbar navbar-default navbar-static-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Node List</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <!-- li><p class="navbar-btn"><button type="button" class="btn btn-lg btn-primary btn-margin-right" data-toggle="modal" data-target="#myModal">Add</button></p></li -->
-            <!-- li><p class="navbar-btn"><button type="button" class="btn btn-lg btn-primary btn-margin-left" data-toggle="modal" data-target="#addURLModal">Add via URL</button></p></li -->
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><p class="navbar-btn"><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-
-
     <div class="container">
+      <header>
+        <!-- Static navbar -->
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">xCAT UI NextGen</a>
+            </div><!-- /.navbar-header -->
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="#">Home</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li><p class="navbar-btn"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span class='glyphicon glyphicon-user'></span> <span id='uid'></span> <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a role="button" id='logout'>Logout</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div><!--/.container-fluid -->
+        </nav>
+      </header>
+
       <div id="msgs"></div>
 
-      <div class="alerter-main">
-        <h1>Node List</h1>
-        <!-- div id="toolbar">
-          <button id="remove" class="btn btn-danger" disabled>
-            <i class="glyphicon glyphicon-remove"></i> Delete
-          </button>
-               data-toolbar="#toolbar"
-        </div -->
+      <div class="app-main" role="application" aria-labelledby="appLabel" aria-hidden="true" hidden>
+        <h1 id="appLabel">Node List</h1>
         <table id="dataTable"
                class="table-hover table-condensed table-striped"
                data-toggle="table"
@@ -98,16 +99,17 @@
             </tr>
           </thead>
         </table>
-      </div>
+      </div><!-- /.app-main -->
 
     </div><!-- /.container -->
-   
+
+    <!-- About Box -->
     <div id="aboutBox" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aboutBoxLabel" aria-hidden="true">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="aboutBoxLabel">Built by Samveen &lt;infra@Lazada.com&gt;</h3>
+            <h3 id="aboutBoxLabel">Built by Samveen &lt;samveenATsamveenDOTin&gt;</h3>
           </div>
           <div class="modal-body">
           </div>
@@ -117,80 +119,44 @@
         </div>
       </div>
     </div>
+    <!-- About Box END-->
 
-    <!-- Begin Container for Add form -->
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <!-- Login form Modal -->
+    <div id="myLoginModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="myLoginModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
       <div class="modal-dialog">
         <div class="modal-content">
+          <form class="form-signin">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">Add Tracking Item</h3>
+            <h3 id="myLoginModalLabel">xCAT-UI-NG Login</h3>
           </div>
           <div class="modal-body">
-            <form class="form-horizontal col-sm-12">
-              <!-- TODO - Add data validation to form -->
               <div class="form-group">
-                <label for="type">Type</label>
-                <input name="type" class="form-control" placeholder="Item Type" type="text">
+                <label for="type">Username</label>
+                <input type="text" name="inputUsername" class="form-control" placeholder="Username" required autofocus>
               </div>
               <div class="form-group">
-                <label for="host">Host</label>
-                <input name="host" class="form-control host" placeholder="Hostname where the item is(can contain wildcards)" data-placement="top" data-trigger="manual" type="text">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" name="inputPassword" class="form-control" placeholder="Password" required>
               </div>
               <div class="form-group">
-                <label for="path">Path</label>
-                <input name="path" class="form-control path" placeholder="Path of item" data-placement="top" data-trigger="manual" data-content="" type="text">
-              </div>
-              <div class="form-group">
-                <label for="expiry">Expiry</label>
-                <div class="input-group date">
-                  <input name="expiry" class="form-control" placeholder="Expiration date of the item" data-placement="top" data-content="" type="text">
-                  <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                  </label>
                 </div>
               </div>
-              <div class="form-group">
-                <button id="submit" type="submit" class="btn btn-success pull-right">Add</button>
-                <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p>
-              </div>
-            </form>
           </div>
           <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" id="submit">Sign in</button>
           </div>
+          </form>
         </div>
       </div>
     </div>
-    <!-- End Container for Add form -->
+    <!-- End Login form Modal -->
 
-    <!-- Begin Container for Add URL form -->
-    <div id="addURLModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="AddURLModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="AddURLModalLabel">Add Item via URL</h3>
-          </div>
-          <div class="modal-body">
-            <form class="form-horizontal col-sm-12">
-              <!-- TODO - Add data validation to form -->
-              <div class="form-group">
-                <label for="url">URL</label>
-                <input name="url" class="form-control" placeholder="hostname.domain[:port](default:443)" type="text">
-              </div>
-              <div class="form-group">
-                <button id="submit" type="submit" class="btn btn-success pull-right">Add</button>
-                <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End Container for Add URL form -->
-
+    <!-- Context menu BEGIN-->
     <div id="node-context-menu">
       <ul class="dropdown-menu" role="menu">
         <li id='decommission'><a tabindex="-1" name="decomm">Decommission</a></li>
@@ -204,16 +170,15 @@
         <li id='install'><a tabindex="-1" name="inst">Install OSImage</a></li>
       </ul>
     </div>
+    <!-- Context menu END-->
 
     <!-- Bootstrap core JavaScript BEGIN -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script type="text/javascript" src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
     <!-- Bootstrap core JavaScript END -->
-
     <!-- Bootstrap Table plugin JavaScript -->
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.0/bootstrap-table.min.js"></script>
 
@@ -225,133 +190,128 @@
     <!-- script src="https://cdn.rawgit.com/prograhammer/bootstrap-table-contextmenu/master/dist/bootstrap-table-contextmenu.min.js"></script -->
 
     <script type="text/javascript"> <!-- Custom JS -->
-    $(function() {
-        //Twitter bootstrap scripts
-        $(document).ready(function() {
-            var $table = $("#dataTable");
-            if(location.search.match("\\bgroup=")!=null) 
-                $table.bootstrapTable('refresh', {url: 'cgi-bin/getNodeList?group=' + location.search.split(new RegExp("\\bgroup="))[1]});
-            else
-                $table.bootstrapTable('refresh', {url: 'cgi-bin/getNodeList'});
+    // Page Application Setup/Init function: Called post auth.
+    var App=function(){
+        // Logout button handler
+        jQuery("#logout").click(function(evt){
+            evt.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/doLogout",
+                data: "",
+                dataType: "json",
+                success: function(obj) {
+                    window.location.assign("groups.html");
+                },
+                error: function(x,s,e) {
+                    $("#myLoginModal").modal('hide');
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+        });
+        // Show the app
+        $(".app-main").attr("aria-hidden","false").show();
+        // All post auth page initialization goes here
+        // Correct the title
+        document.title = "xCAT Node list";
 
-            $table.on('post-body.bs.table', function (e) {
-                e.preventDefault();
-                $('#dataTable tr').has('td').each(function(index,el) {
-                    menu="";
-                    if ($(el).children()[0].textContent.match(/spare/)) {
-                        menu='#spare-context-menu';
-                    } else {
-                        menu='#node-context-menu';
+        var $table = $("#dataTable");
+        if(location.search.match("\\bgroup=")!=null) 
+            $table.bootstrapTable('refresh', {url: 'cgi-bin/getNodeList?group=' + location.search.split(new RegExp("\\bgroup="))[1]});
+        else
+            $table.bootstrapTable('refresh', {url: 'cgi-bin/getNodeList'});
+
+        $table.on('post-body.bs.table', function (e) {
+            e.preventDefault();
+            $('#dataTable tr').has('td').each(function(index,el) {
+                menu="";
+                if (location.search.match("provision")) {
+                    menu='#spare-context-menu';
+                } else {
+                    menu='#node-context-menu';
+                }
+                $(el).contextmenu({
+                    target: menu,
+                    onItem: function(ctx,ev) {
+                        location.href= location.origin+"/webui/"+ev.currentTarget.id+".html?node="+$(ctx).children()[0].textContent;
+                        //console.log('ev:');
+                        //console.log(ev);
                     }
-                    $(el).contextmenu({
-                        target: menu,
-                        onItem: function(ctx,ev) {
-                            location.href= location.origin+"/webui/"+ev.currentTarget.id+".html?node="+$(ctx).children()[0].textContent;
-                            //console.log('ev:');
-                            //console.log(ev);
-                        }
-                    });
                 });
             });
+        });
 
-            // handler for Row click
-            $table.on('click-row.bs.table', function (e, row, $element) {
-                e.preventDefault();
-                if (row["node"].match(/spare/)) {
-                    console.log($element);
-                    //location.href= location.origin+"/webui/provision.html?node="+row.node;
+        // handler for Row click
+        $table.on('click-row.bs.table', function (e, row, $element) {
+            e.preventDefault();
+            if (location.search.match("provision")) {
+                //console.log($element);
+                location.href= location.origin+"/webui/provision.html?node="+row.node;
+            } else {
+                //console.log($element);
+                location.href= location.origin+"/webui/decommission.html?node="+row.node;
+            }
+        });
+    };
+    // End - Page Application Setup/Init function
+
+    // Auth
+    $(function() {
+        // Auth Event flow tracker variable
+        var lastEvent='';
+
+        // Modal close action
+         $('#myLoginModal').on('hidden.bs.modal', function (event) {
+             setTimeout(function() { location.reload();}, 3000);
+         })
+
+        // Setup login Form Submit handler
+        $("#myLoginModal").submit(function(evt){
+            console.log(evt.type);
+            lastEvent='modal.submit';
+            evt.preventDefault();
+            $("#myLoginModal").modal('hide');
+            $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Processing Login...</div>");
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/doLogin",
+                data: $('#myLoginModal form').serialize(),
+                dataType: "json",
+                success: function(obj) {
+                    if("data" in obj) {
+                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.data.status+"</div>");
+                        $("#myLoginModal form")[0].reset();
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.error.code+": "+obj.error.message+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+            return(true);
+        });
+
+        // Check if isAuthenticated ();
+        $.ajax({
+            type: "POST",
+            url: "cgi-bin/isAuthenticated",
+            data: '',
+            dataType: "json",
+            success: function(obj) {
+                if("data" in obj) {
+                    $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Welcome, "+obj.data.uid+"</div>");
+                    $('#uid').html(obj.data.displayName);
+                    App();
                 } else {
-                    console.log($element);
-                    //location.href= location.origin+"/webui/decommission.html?node="+row.node;
+                    $("#myLoginModal").modal('show');
                 }
-            });
+            },
+            error: function(x,s,e) {
+                $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                setTimeout(function() { location.reload();}, 3000);
+            }
         });
-
-/*
-        var $removeBTN = $('#remove');
-
-        $removeBTN.click(function () {
-            var selected = $.map($table.bootstrapTable('getSelections'), function (row) { return row.rowid });
-///////
-            $.ajax({
-                type: "POST",
-                url: "cgi-bin/removeData",
-                data: JSON.stringify({ rowids: selected.join() }),
-                dataType: "json",
-                success: function(msg) {
-                    if(msg.status==='Success' || msg.status==='success') {
-                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+"</div>");
-                        $table.bootstrapTable('refresh', {silent: true});
-                        $removeBTN.prop('disabled', true);
-                    } else {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+": "+msg.exception+"</div>");
-                    }
-                },
-                error: function(x,s,e) {
-                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                }
-            });
-
-////////
-            $removeBTN.prop('disabled', true);
-
-        });
-
-        // Checkbox handler to enable/disable "remove" button
-        $table.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
-            $removeBTN.prop('disabled', !$table.bootstrapTable('getSelections').length);
-        });
-
-        // Add Form Submit handler
-        $("#myModal #submit").click(function(){
-            $.ajax({
-                type: "POST",
-                url: "cgi-bin/putData",
-                data: $('#myModal form').serialize(),
-                dataType: "json",
-                success: function(msg) {
-                    if(msg.status==='Success' || msg.status==='success') {
-                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+"</div>");
-                        $('#dataTable').bootstrapTable('refresh', {silent: true});
-                        $("#myModal form")[0].reset();
-                    } else {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+": "+msg.exception+"</div>");
-                    }
-                    $("#myModal").modal('hide');
-                },
-                error: function(x,s,e) {
-                    $("#myModal").modal('hide');
-                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                }
-            });
-            return(false);
-        });
-
-        // Add URL Submit handler
-        $("#addURLModal #submit").click(function(){
-            $.ajax({
-                type: "POST",
-                url: "cgi-bin/putURL",
-                data: $('#addURLModal form').serialize(),
-                dataType: "json",
-                success: function(msg) {
-                    if(msg.status==='Success' || msg.status==='success') {
-                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+"</div>");
-                        $('#dataTable').bootstrapTable('refresh', {silent: true});
-                        $("#addURLModal form")[0].reset();
-                    } else {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+msg.status+": "+msg.exception+"</div>");
-                    }
-                    $("#addURLModal").modal('hide');
-                },
-                error: function(x,s,e) {
-                    $("#addURLModal").modal('hide');
-                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                }
-            });
-            return(false);
-        });
-        */
     });
     </script>
   </body>
