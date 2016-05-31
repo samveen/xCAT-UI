@@ -5,17 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="xCAT Groups list">
+    <meta name="description" content="xCAT OSImage install">
     <meta name="author" content="Samveen">
     <link rel="icon" href="images/favicon.ico">
 
-    <title>OSImage Install</title>
+    <title>Login - xCAT UI NextGen</title>
+
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
 
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="css/node.css">
+    <link href="css/navbar.css" rel="stylesheet">
 
     <!-- HTML5 Shiv and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -31,7 +33,7 @@
         <nav class="navbar navbar-default">
           <div class="container-fluid">
             <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -39,15 +41,19 @@
               </button>
               <a class="navbar-brand" href="#">xCAT UI NextGen</a>
             </div><!-- /.navbar-header -->
-            <div class="navbar-collapse collapse">
+            <div id="navbar" class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-                <li class="active  navbar-btn">
-                  <button id="about" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button>
-                </li>
+                <li><a href="#">Home</a></li>
               </ul>
-              <ul class="nav navbar-nav pull-right">
-                <li class='dropdown-menu-right navbar-btn'>
-                  <button id="contact" class="btn btn-primary">Contact</button>
+              <ul class="nav navbar-nav navbar-right">
+                <li><p class="navbar-btn"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#aboutBox">About</button></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span class='glyphicon glyphicon-user'></span> <span id='uid'></span> <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a role="button" id='logout'>Logout</a></li>
+                  </ul>
                 </li>
               </ul>
             </div><!--/.nav-collapse -->
@@ -57,7 +63,7 @@
 
       <div id="msgs"></div>
 
-      <div class="app-main" id="app" role="application" aria-labelledby='appLabel' aria-hidden="true">
+      <div class="app-main" role="application" id="app" aria-hidden="true" hidden>
        <div class="col-xs-8 col-md-8">
          <div class="panel panel-default">
            <div class="panel-heading">Install OSImage on Node</div>
@@ -128,7 +134,8 @@
            </div>
          </div>
        </div>
-      </div>
+      </div><!-- /.app-main -->
+
     </div><!-- /.container -->
 
     <!-- About Box -->
@@ -137,7 +144,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="aboutBoxLabel">Built by Samveen &lt;infra@Lazada.com&gt;</h3>
+            <h3 id="aboutBoxLabel">Built by Samveen &lt;samveenATsamveenDOTin&gt;</h3>
           </div>
           <div class="modal-body">
           </div>
@@ -148,6 +155,41 @@
       </div>
     </div>
     <!-- About Box END-->
+
+    <!-- Login form Modal -->
+    <div id="myLoginModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="myLoginModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-signin">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myLoginModalLabel">xCAT-UI-NG Login</h3>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                <label for="type">Username</label>
+                <input type="text" name="inputUsername" class="form-control" placeholder="Username" required autofocus>
+              </div>
+              <div class="form-group">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" name="inputPassword" class="form-control" placeholder="Password" required>
+              </div>
+              <div class="form-group">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                  </label>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-lg btn-primary btn-block" type="submit" id="submit">Sign in</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- End Login form Modal -->
 
     <!-- Bootstrap core JavaScript BEGIN -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -160,25 +202,156 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
 
     <script type="text/javascript"> <!-- Custom JS -->
-      $(function () {
-        $(document).ready(function() {
-            // Enable tooltip 
-            $('[data-toggle="tooltip"]').tooltip()
-            // Load osimage into form
+    // Page Application Setup/Init function: Called post auth.
+    var App=function(){
+        // Logout button handler
+        jQuery("#logout").click(function(evt){
+            evt.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/doLogout",
+                data: "",
+                dataType: "json",
+                success: function(obj) {
+                    window.location.assign("groups.html");
+                },
+                error: function(x,s,e) {
+                    $("#myLoginModal").modal('hide');
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+        });
+        // Enable tooltip 
+        $('[data-toggle="tooltip"]').tooltip()
+        // Show the app
+        $(".app-main").attr("aria-hidden","false").show();
+        // All post auth page initialization goes here
+        // Correct the title
+        document.title = "xCAT - OSImage Install";
+        // Load osimage into form
+        $.ajax({
+            type: "GET",
+            url: "cgi-bin/getOSImages",
+            dataType: "json",
+            data: {},
+            async: false,
+            success: function(data) {
+                if(data.msg.status==='Success' || data.msg.status==='success') {
+                    //$('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+"</div>");
+                    var $osimageSel = $("#osimage");
+                    for(index in data.osimages) {
+                        $osimageSel.append(new Option(data.osimages[index], data.osimages[index]));
+                    }
+                    $osimageSel.selectpicker('refresh');
+                } else {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.error.code+": "+obj.error.message+"</div>");
+                }
+            },
+            error: function(x,s,e) {
+                $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+            }
+        });
+        // Load Node data into form - Last?
+        if(location.search.match("\\bnode=")!=null) {
             $.ajax({
                 type: "GET",
-                url: "cgi-bin/getOSImages",
+                url: "cgi-bin/getNodeInfo",
                 dataType: "json",
-                data: {},
-                async: false,
+                data: 'node='+location.search.split(new RegExp("\\bnode="))[1].split('&')[0],
                 success: function(data) {
                     if(data.msg.status==='Success' || data.msg.status==='success') {
-                        //$('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+"</div>");
-                        var $osimageSel = $("#osimage");
-                        for(index in data.osimages) {
-                            $osimageSel.append(new Option(data.osimages[index], data.osimages[index]));
+                        for(var k in data.node) {
+                            if(k==='mac') {
+                                for(var m in data.node[k]) {
+                                    $('#'+data.node[k][m].name).val(data.node[k][m].mac);
+                                }
+                            } else if(k==='provmethod') {
+                                var $osimageSel = $("#osimage");
+                                $osimageSel.selectpicker('val',data.node[k]);
+                                $osimageSel.selectpicker('refresh');
+                            } else {
+                                $("[id='"+k+"']").val(data.node[k]);
+                            }
                         }
-                        $osimageSel.selectpicker('refresh');
+                    } else {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
+                    }
+                },
+                error: function(x,s,e) {
+                    $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                }
+            });
+        } else
+            alert("No Node selected");
+        // Form Submit handler with confirmation enabled
+        $("#app #update").confirmation({
+            btnOkLabel: "Confirm",
+            popout: true,
+            onCancel: function(){
+                history.back();
+            },
+            onConfirm: function(evt){
+                evt.preventDefault();
+                $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
+                $.ajax({
+                    type: "POST",
+                    url: "cgi-bin/installOSImage",
+                    data: $('#updateForm').serialize(),
+                    dataType: "json",
+                    success: function(obj) {
+                        if(obj.data) {
+                            $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Installation of OSImage "+obj.data.osimage+" on "+obj.data.node+" started </div>");
+                        } else {
+                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+obj.error.code+": "+obj.error.message+"</div>");
+                        }
+                    },
+                    error: function(x,s,e) {
+                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                    }
+                });
+                return false;
+            }
+        });
+        // Remove clickability of readonly elements
+        $.each($("input"), function(ind,$obj){
+            if($obj.hasAttribute('readonly'))
+                $obj.onfocus=function(){ $(this).blur(); };
+        })
+        // Anything else
+        $("#app #cancel").click(function(){
+            history.back();
+        });
+
+        // Anything else
+    };
+    // End - Page Application Setup/Init function
+
+    // Auth
+    $(function() {
+        // Auth Event flow tracker variable
+        var lastEvent='';
+
+        // Modal close action
+         $('#myLoginModal').on('hidden.bs.modal', function (event) {
+             setTimeout(function() { location.reload();}, 3000);
+         })
+
+        // Setup login Form Submit handler
+        $("#myLoginModal").submit(function(evt){
+            console.log(evt.type);
+            lastEvent='modal.submit';
+            evt.preventDefault();
+            $("#myLoginModal").modal('hide');
+            $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Processing Login...</div>");
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/doLogin",
+                data: $('#myLoginModal form').serialize(),
+                dataType: "json",
+                success: function(obj) {
+                    if("data" in obj) {
+                        $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.data.status+"</div>");
+                        $("#myLoginModal form")[0].reset();
                     } else {
                         $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+obj.error.code+": "+obj.error.message+"</div>");
                     }
@@ -187,81 +360,30 @@
                     $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
                 }
             });
-            // Load Node data into form - Last?
-            if(location.search.match("\\bnode=")!=null) {
-                $.ajax({
-                    type: "GET",
-                    url: "cgi-bin/getNodeInfo",
-                    dataType: "json",
-                    data: 'node='+location.search.split(new RegExp("\\bnode="))[1].split('&')[0],
-                    success: function(data) {
-                        if(data.msg.status==='Success' || data.msg.status==='success') {
-                            for(var k in data.node) {
-                                if(k==='mac') {
-                                    for(var m in data.node[k]) {
-                                        $('#'+data.node[k][m].name).val(data.node[k][m].mac);
-                                    }
-                                } else if(k==='provmethod') {
-                                    var $osimageSel = $("#osimage");
-                                    $osimageSel.selectpicker('val',data.node[k]);
-                                    $osimageSel.selectpicker('refresh');
-                                } else {
-                                    $("[id='"+k+"']").val(data.node[k]);
-                                }
-                            }
-                        } else {
-                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+data.msg.status+": "+data.msg.exception+"</div>");
-                        }
-                    },
-                    error: function(x,s,e) {
-                        $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                    }
-                });
-            } else
-                alert("No Node selected");
-            // Form Submit handler with confirmation enabled
-            $("#app #update").confirmation({
-                btnOkLabel: "Confirm",
-                popout: true,
-                onCancel: function(){
-                    history.back();
-                },
-                onConfirm: function(evt){
-                    evt.preventDefault();
-                    $('#msgs').html("<div class='alert alert-info'><a href='#' class='close' data-dismiss='alert'>&times;</a>Submitting data to xCAT server...</div>");
-                    $.ajax({
-                        type: "POST",
-                        url: "cgi-bin/installOSImage",
-                        data: $('#updateForm').serialize(),
-                        dataType: "json",
-                        success: function(obj) {
-                            if(obj.data) {
-                                $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Installation of OSImage "+obj.data.osimage+" on "+obj.data.node+" started </div>");
-                            } else {
-                                $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>Code "+obj.error.code+": "+obj.error.message+"</div>");
-                            }
-                        },
-                        error: function(x,s,e) {
-                            $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
-                        }
-                    });
-                    return false;
-                }
-            });
-            // Remove clickability of readonly elements
-            $.each($("input"), function(ind,$obj){
-                if($obj.hasAttribute('readonly'))
-                    $obj.onfocus=function(){ $(this).blur(); };
-            })
-            // Anything else
-            $("#app #cancel").click(function(){
-                history.back();
-            });
-
-            // Anything else
+            return(true);
         });
 
-      })
+        // Check if isAuthenticated ();
+        $.ajax({
+            type: "POST",
+            url: "cgi-bin/isAuthenticated",
+            data: '',
+            dataType: "json",
+            success: function(obj) {
+                if("data" in obj) {
+                    $('#msgs').html("<div class='alert alert-success'><a href='#' class='close' data-dismiss='alert'>&times;</a>Welcome, "+obj.data.uid+"</div>");
+                    $('#uid').html(obj.data.displayName);
+                    App();
+                } else {
+                    $("#myLoginModal").modal('show');
+                }
+            },
+            error: function(x,s,e) {
+                $('#msgs').html("<div class='alert alert-danger'><a href='#' class='close' data-dismiss='alert'>&times;</a>"+s+": "+e+"</div>");
+                setTimeout(function() { location.reload();}, 3000);
+            }
+        });
+    });
     </script>
   </body>
 </html>
