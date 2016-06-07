@@ -14,6 +14,12 @@ def main (environ):
     """ Reads the groups and returns a json result as a list of strings
     """
 
+    # Auth check
+    session=environ['beaker.session']
+    if 'user_id' not in session:
+        # Authentication Failed
+        return '{"error": { "code": -512, "message": "Not Authenticated"}}'
+
     pattern = None
     if 'DisplayGroups' in config['getGroups']:
         pattern = re.compile(config['getGroups']['DisplayGroups'])

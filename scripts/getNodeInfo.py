@@ -11,6 +11,13 @@ import subprocess
 def main (environ):
     """ Reads the DB and returns a json result as a list of strings
     """
+
+    # Auth check
+    session=environ['beaker.session']
+    if 'user_id' not in session:
+        # Authentication Failed
+        return '{"error": { "code": -512, "message": "Not Authenticated"}}'
+
     command=[ "lsdef",
                   "-t", "node",
                   "-o"

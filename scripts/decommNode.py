@@ -16,6 +16,13 @@ def process_cmd(cmd):
 def main (environ):
     """ Reads the query string and updates node fields as per values
     """
+
+    # Auth check
+    session=environ['beaker.session']
+    if 'user_id' not in session:
+        # Authentication Failed
+        return '{"error": { "code": -512, "message": "Not Authenticated"}}'
+
     command=[ "lsdef",
                   "-t", "node",
                   "-o"
