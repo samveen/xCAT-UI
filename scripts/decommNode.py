@@ -115,7 +115,9 @@ Object name: spare19-a1
             if len(result) == 0:
                 # All checks passed. Do your magic:
 
-                # Remove dhcp,dns,hosts entries
+                # Remove dhcp,dns,hosts,conserver entries
+                command=["makeconservercf","-d",node]
+                process_cmd(cmd=command)
                 command=["makedhcp","-d","{0},{0}-ilo".format(node)]
                 process_cmd(cmd=command)
                 command=["makedns","-d","{0},{0}-ilo".format(node)]
@@ -145,12 +147,14 @@ Object name: spare19-a1
                     command=["chdef","-t","node",newnode,"nicips.ens1f0="]
                     process_cmd(cmd=command)
 
-                # Remake dhcp,dns,hosts entries
+                # Remake dhcp,dns,hosts,conserver entries
                 command=["makehosts","{0},{0}-ilo".format(newnode)]
                 process_cmd(cmd=command)
                 command=["makedns","{0},{0}-ilo".format(newnode)]
                 process_cmd(cmd=command)
                 command=["makedhcp","{0},{0}-ilo".format(newnode)]
+                process_cmd(cmd=command)
+                command=["makeconservercf",newnode]
                 process_cmd(cmd=command)
 
                 # Change osimage and start provision process
